@@ -3,8 +3,7 @@ import { Module } from '@nestjs/common';
 import { FetchDataApiService } from './fetch-data-api.service';
 
 @Module({
-  imports: [HttpModule],
+  imports: [HttpModule]
   providers: [FetchDataApiService],
-  exports: [FetchDataApiService],
 })
 export class FetchDataApiModule {}

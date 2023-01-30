@@ -2,7 +2,6 @@ import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { GetCountryParam } from 'src/get/types/get.types';
-import { FetchDataApiGeoResponse } from '../types/fetch-data-api.types';
 
 @Injectable()
 export class FetchDataApiService {
@@ -12,9 +11,7 @@ export class FetchDataApiService {
   constructor(private readonly httpService: HttpService) {}
 
   public async getDataFromApi(countryName: string) {
-    const { latitude, longitude, country } = await this.getGeoLocation(
-      countryName,
-    );
+    const { latitude, longitude } = await this.getGeoLocation(countryName);
     const params = {
       latitude,
       longitude,
@@ -23,14 +20,12 @@ export class FetchDataApiService {
     const { data } = await firstValueFrom(
       this.httpService.get(this.weatherUrl, { params }),
     );
+    console.log(data);
 
-    return {
-      data,
-      country,
-    };
+    return data;
   }
 
-  private async getGeoLocation(name: string): Promise<FetchDataApiGeoResponse> {
+  private async getGeoLocation(name: string) {
     const params = {
       name,
       count: 1,
@@ -39,6 +34,8 @@ export class FetchDataApiService {
     const { data } = await firstValueFrom(
       this.httpService.get(this.geoUrl, { params }),
     );
+
+    console.log(data);
 
     if (!data.hasOwnProperty('results')) {
       throw new HttpException('Location not found', HttpStatus.BAD_REQUEST);
