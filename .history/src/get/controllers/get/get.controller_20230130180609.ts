@@ -13,6 +13,6 @@ export class GetController {
   async getAverageTemperatureForCountry(
     @Param() { countryName }: GetCountryParam,
   ): Promise<GetCountryTempResponse> {
-    return this.getService.getCountryAvgTemp(countryName);
+    return this.getService(countryName);
   }
 }

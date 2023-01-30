@@ -1,4 +1,10 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+} from '@nestjs/common';
 import { GetService } from 'src/get/services/get/get.service';
 import {
   GetCountryParam,
@@ -13,6 +19,6 @@ export class GetController {
   async getAverageTemperatureForCountry(
     @Param() { countryName }: GetCountryParam,
   ): Promise<GetCountryTempResponse> {
-    return this.getService.getCountryAvgTemp(countryName);
+    return this.getService(countryName);
   }
 }
