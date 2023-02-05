@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
   PredictionForecastResponse,
+  PredictionRouteCityDayParams,
   PredictionRouteCountryDayParams,
 } from 'src/prediction/types/prediction.types';
 import { FetchDataApiService } from 'src/utils/fetch-data-api/fetch-data-api.service';
@@ -53,6 +54,51 @@ export class PredictionService {
 
     return {
       location: country,
+      day: day,
+      avgTemperature,
+      weather: weatherCode,
+    };
+  }
+
+  public async getForecastForCity({
+    day,
+    city,
+  }: PredictionRouteCityDayParams): Promise<PredictionForecastResponse> {
+    const { latitude, longitude, location } =
+      await this.fetchDataApi.getGeoLocation(city);
+
+    if (location.toLowerCase() === city.toLowerCase()) {
+      throw new HttpException(
+        `It is not a city: ${city}`,
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const fetchDataApiParams: FetchDataApiParams = {
+      latitude,
+      longitude,
+      start_date: day,
+      end_date: day,
+      hourly: 'temperature_2m,weathercode',
+    };
+
+    const {
+      data: {
+        hourly: { temperature_2m, weathercode },
+      },
+    } = await this.fetchDataApi.getDataFromApi(fetchDataApiParams);
+
+    const avgTemperature: string = (
+      temperature_2m.reduce((a: number, b: number) => a + b, 0) /
+      temperature_2m.length
+    ).toFixed(1);
+
+    const weatherCode = this.tools.getWeatherCode(
+      Number(this.tools.mostFrequent(weathercode)),
+    );
+
+    return {
+      location: city,
       day: day,
       avgTemperature,
       weather: weatherCode,

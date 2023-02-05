@@ -9,3 +9,8 @@ export type PredictionRouteCountryDayParams = {
   day: string;
   country: string;
 };
+
+export type PredictionRouteCityDayParams = {
+  day: string;
+  city: string;
+};
