@@ -1,8 +1,10 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
-import { GetCountryParam } from 'src/get/types/get.types';
-import { FetchDataApiGeoResponse } from '../types/fetch-data-api.types';
+import {
+  FetchDataApiGeoResponse,
+  FetchDataApiParams,
+} from './types/FetchDataApi.types';
 
 @Injectable()
 export class FetchDataApiService {
@@ -11,26 +13,17 @@ export class FetchDataApiService {
 
   constructor(private readonly httpService: HttpService) {}
 
-  public async getDataFromApi(countryName: string) {
-    const { latitude, longitude, country } = await this.getGeoLocation(
-      countryName,
-    );
-    const params = {
-      latitude,
-      longitude,
-      current_weather: true,
-    };
+  public async getDataFromApi(params: FetchDataApiParams) {
     const { data } = await firstValueFrom(
       this.httpService.get(this.weatherUrl, { params }),
     );
 
     return {
       data,
-      country,
     };
   }
 
-  private async getGeoLocation(name: string): Promise<FetchDataApiGeoResponse> {
+  public async getGeoLocation(name: string): Promise<FetchDataApiGeoResponse> {
     const params = {
       name,
       count: 1,
@@ -51,7 +44,7 @@ export class FetchDataApiService {
     return {
       latitude,
       longitude,
-      country,
+      location: country,
     };
   }
 }
