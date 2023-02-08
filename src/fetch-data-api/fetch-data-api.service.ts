@@ -1,5 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+
 import { firstValueFrom } from 'rxjs';
 import { LocationType } from 'src/prediction/types/prediction.types';
 import {
@@ -9,46 +11,103 @@ import {
 
 @Injectable()
 export class FetchDataApiService {
-  private weatherUrl = 'https://api.open-meteo.com/v1/forecast';
-  private geoUrl = 'https://geocoding-api.open-meteo.com/v1/search';
+  private readonly weatherUrl;
+  private readonly geoUrl;
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    this.weatherUrl = this.configService.get<string>('WEATHER_URL');
+    this.geoUrl = this.configService.get<string>('GEO_URL');
+  }
 
   public async getDataFromApi(params: FetchDataApiParams) {
-    const { data } = await firstValueFrom(
-      this.httpService.get(this.weatherUrl, { params }),
-    );
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.get(this.weatherUrl, { params }),
+      );
+      if (data.error) {
+        throw new HttpException(
+          { status: HttpStatus.BAD_REQUEST, message: 'Invalid coordinates' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
-    return {
-      data,
-    };
+      return {
+        data,
+      };
+    } catch ({ response }) {
+      throw new HttpException(
+        {
+          status:
+            response.status === 404
+              ? HttpStatus.INTERNAL_SERVER_ERROR
+              : HttpStatus.BAD_REQUEST,
+          error:
+            response.status === 404
+              ? 'Internal server error'
+              : response.message,
+        },
+        response.status === 404
+          ? HttpStatus.INTERNAL_SERVER_ERROR
+          : HttpStatus.BAD_REQUEST,
+        {
+          cause: response,
+        },
+      );
+    }
   }
 
   public async getGeoLocation(name: string): Promise<FetchDataApiGeoResponse> {
-    const params = {
-      name,
-      count: 1,
-    };
+    try {
+      const params = {
+        name,
+        count: 1,
+      };
 
-    const { data } = await firstValueFrom(
-      this.httpService.get(this.geoUrl, { params }),
-    );
+      const { data } = await firstValueFrom(
+        this.httpService.get(this.geoUrl, { params }),
+      );
 
-    if (!data.hasOwnProperty('results')) {
-      throw new HttpException('Location not found', HttpStatus.BAD_REQUEST);
+      if (!data.hasOwnProperty('results')) {
+        throw new HttpException(
+          { status: HttpStatus.BAD_REQUEST, message: 'Location not found' },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const {
+        results: [{ latitude, longitude, country }],
+      } = data;
+
+      return {
+        latitude,
+        longitude,
+        location:
+          country.toLowerCase() === name.toLowerCase()
+            ? LocationType.Country
+            : LocationType.City,
+      };
+    } catch ({ response }) {
+      throw new HttpException(
+        {
+          status:
+            response.status === 404
+              ? HttpStatus.INTERNAL_SERVER_ERROR
+              : HttpStatus.BAD_REQUEST,
+          error:
+            response.status === 404
+              ? 'Internal server error'
+              : response.message,
+        },
+        response.status === 404
+          ? HttpStatus.INTERNAL_SERVER_ERROR
+          : HttpStatus.BAD_REQUEST,
+        {
+          cause: response,
+        },
+      );
     }
-
-    const {
-      results: [{ latitude, longitude, country }],
-    } = data;
-
-    return {
-      latitude,
-      longitude,
-      location:
-        country.toLowerCase() === name.toLowerCase()
-          ? LocationType.Country
-          : LocationType.City,
-    };
   }
 }

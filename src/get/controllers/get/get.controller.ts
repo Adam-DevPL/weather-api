@@ -37,11 +37,12 @@ export class GetController {
 
   @Get('location/:lat/:lon')
   async getLocationWeather(
-    @Param() getLocationParam: GetLocationParam,
+    @Param('lat') lat: number,
+    @Param('lon') lon: number,
   ): Promise<GetWeatherResponse> {
     const getRouteLocationParam: GetRouteLocationParam = {
       locationType: LocationType.Geo,
-      locationParam: getLocationParam,
+      locationParam: { lat, lon },
     };
     return this.getService.getCurrentWeather(getRouteLocationParam);
   }
