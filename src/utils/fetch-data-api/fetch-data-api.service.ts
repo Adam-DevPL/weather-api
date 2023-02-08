@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
+import { LocationType } from 'src/prediction/types/prediction.types';
 import {
   FetchDataApiGeoResponse,
   FetchDataApiParams,
@@ -44,7 +45,10 @@ export class FetchDataApiService {
     return {
       latitude,
       longitude,
-      location: country,
+      location:
+        country.toLowerCase() === name.toLowerCase()
+          ? LocationType.Country
+          : LocationType.City,
     };
   }
 }

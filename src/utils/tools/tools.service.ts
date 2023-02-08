@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ToolsService {
+  public getAverage = (arr: number[]): number => {
+    return arr.reduce((acc, item) => acc + item, 0) / arr.length;
+  };
+
   public mostFrequent = (arr: number[]): string =>
     Object.entries(
       arr.reduce((a, v) => {

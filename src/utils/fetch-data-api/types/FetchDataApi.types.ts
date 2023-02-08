@@ -1,3 +1,5 @@
+import { LocationType } from 'src/prediction/types/prediction.types';
+
 export type FetchDataApiParams = {
   latitude: number;
   longitude: number;
@@ -10,5 +12,5 @@ export type FetchDataApiParams = {
 export type FetchDataApiGeoResponse = {
   latitude: number;
   longitude: number;
-  location: string;
+  location: LocationType;
 };

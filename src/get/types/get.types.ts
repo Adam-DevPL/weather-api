@@ -1,13 +1,17 @@
 import { IsAlpha, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  GeoCoordinates,
+  LocationType,
+} from 'src/prediction/types/prediction.types';
 
-export class GetCountryParam {
+export class GetRouteCountryParam {
   @IsNotEmpty()
   @IsString()
   @IsAlpha()
   country: string;
 }
 
-export class GetCityParam {
+export class GetRouteCityParam {
   @IsNotEmpty()
   @IsString()
   @IsAlpha()
@@ -21,13 +25,18 @@ export class GetLocationParam {
   lon: number;
 }
 
-export type GetCountryTempResponse = {
-  country: string;
-  avgTemperatue: number;
-};
+export type GetRouteLocationParam =
+  | {
+      locationType: LocationType.Geo;
+      locationParam: GeoCoordinates;
+    }
+  | {
+      locationType: LocationType.City | LocationType.Country;
+      locationParam: string;
+    };
 
 export type GetWeatherResponse = {
-  city?: string;
-  temperature: number;
+  location: string | GeoCoordinates;
+  avgTemperature: number;
   weather: string;
 };

@@ -1,35 +1,48 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { GetService } from 'src/get/services/get/get.service';
 import {
-  GetCityParam,
   GetWeatherResponse,
-  GetCountryParam,
-  GetCountryTempResponse,
   GetLocationParam,
+  GetRouteLocationParam,
+  GetRouteCountryParam,
+  GetRouteCityParam,
 } from 'src/get/types/get.types';
+import { LocationType } from 'src/prediction/types/prediction.types';
 
 @Controller('weather/get')
 export class GetController {
   constructor(private getService: GetService) {}
 
   @Get('country/:country')
-  async getAverageTemperatureForCountry(
-    @Param() getCountryParam: GetCountryParam,
-  ): Promise<GetCountryTempResponse> {
-    return this.getService.getCountryAvgTemp(getCountryParam);
+  async getWeatherForCountry(
+    @Param() { country }: GetRouteCountryParam,
+  ): Promise<GetWeatherResponse> {
+    const getRouteLocationParam: GetRouteLocationParam = {
+      locationType: LocationType.Country,
+      locationParam: country,
+    };
+    return this.getService.getCurrentWeather(getRouteLocationParam);
   }
 
   @Get('city/:city')
   async getWeatherForCity(
-    @Param() getCityParam: GetCityParam,
+    @Param() { city }: GetRouteCityParam,
   ): Promise<GetWeatherResponse> {
-    return this.getService.getCityWeather(getCityParam);
+    const getRouteLocationParam: GetRouteLocationParam = {
+      locationType: LocationType.City,
+      locationParam: city,
+    };
+    return this.getService.getCurrentWeather(getRouteLocationParam);
   }
 
   @Get('location/:lat/:lon')
   async getLocationWeather(
     @Param() getLocationParam: GetLocationParam,
   ): Promise<GetWeatherResponse> {
-    return this.getService.getLocationWeather(getLocationParam);
+    const getRouteLocationParam: GetRouteLocationParam = {
+      locationType: LocationType.Geo,
+      locationParam: getLocationParam,
+    };
+    return this.getService.getCurrentWeather(getRouteLocationParam);
   }
 }
