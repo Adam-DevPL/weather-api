@@ -8,9 +8,9 @@ import {
   PredictionRouteLocationSingleDayParam,
   WeatherInfo,
 } from 'src/prediction/types/prediction.types';
-import { FetchDataApiService } from 'src/utils/fetch-data-api/fetch-data-api.service';
-import { FetchDataApiParams } from 'src/utils/fetch-data-api/types/FetchDataApi.types';
-import { ToolsService } from 'src/utils/tools/tools.service';
+import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
+import { FetchDataApiParams } from 'src/fetch-data-api/types/FetchDataApi.types';
+import { ToolsService } from 'src/tools/tools.service';
 
 @Injectable()
 export class PredictionService {
