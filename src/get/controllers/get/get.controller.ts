@@ -1,17 +1,19 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { GetService } from 'src/get/services/get/get.service';
 import {
-  WeatherResponse,
   GetRouteCountryParam,
   GetRouteCityParam,
   LocationNameParam,
   CoordinatesParam,
+  WeatherResponse,
+  GeoCoordinatesParam,
 } from 'src/get/types/get.types';
 import { LocationType } from 'src/prediction/types/prediction.types';
 
 @Controller('weather/get')
 export class GetController {
   constructor(private getService: GetService) {}
+  Z;
 
   @Get('country/:country')
   async getWeatherForCountry(
@@ -41,8 +43,7 @@ export class GetController {
 
   @Get('location/:lat/:lon')
   async getLocationWeather(
-    @Param('lat') lat: number,
-    @Param('lon') lon: number,
+    @Param() { lat, lon }: GeoCoordinatesParam,
   ): Promise<WeatherResponse> {
     const coordinatesParam: CoordinatesParam = {
       lat,

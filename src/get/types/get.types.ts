@@ -1,4 +1,5 @@
-import { IsAlpha, IsNotEmpty, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsAlpha, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import {
   GeoCoordinates,
   LocationType,
@@ -16,6 +17,16 @@ export class GetRouteCityParam {
   @IsString()
   @IsAlpha()
   city: string;
+}
+
+export class GeoCoordinatesParam {
+  @IsNumber()
+  @Type(() => Number)
+  lat: number;
+
+  @IsNumber()
+  @Type(() => Number)
+  lon: number;
 }
 
 export type LocationNameParam = {
