@@ -1,30 +1,60 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { GetCountryTempResponse } from 'src/get/types/get.types';
+import {
+  GetWeatherResponse,
+  GetRouteLocationParam,
+} from 'src/get/types/get.types';
+import { LocationType } from 'src/prediction/types/prediction.types';
 import { FetchDataApiService } from 'src/utils/fetch-data-api/fetch-data-api.service';
+import { FetchDataApiParams } from 'src/utils/fetch-data-api/types/FetchDataApi.types';
+import { ToolsService } from 'src/utils/tools/tools.service';
 
 @Injectable()
 export class GetService {
-  constructor(private fetchDataApi: FetchDataApiService) {}
+  constructor(
+    private fetchDataApi: FetchDataApiService,
+    private tools: ToolsService,
+  ) {}
 
-  public async getCountryAvgTemp(
-    countryName: string,
-  ): Promise<GetCountryTempResponse> {
+  public async getCurrentWeather({
+    locationType,
+    locationParam,
+  }: GetRouteLocationParam): Promise<GetWeatherResponse> {
+    let lon: number;
+    let lat: number;
+
+    if (locationType !== LocationType.Geo) {
+      const { latitude, longitude, location } =
+        await this.fetchDataApi.getGeoLocation(locationParam);
+
+      if (locationType !== location) {
+        throw new HttpException(
+          `It is not a ${LocationType[locationType]}: ${locationParam}`,
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      lat = latitude;
+      lon = longitude;
+    } else {
+      lat = locationParam.lat;
+      lon = locationParam.lon;
+    }
+
+    const fetchDataApiParams: FetchDataApiParams = {
+      latitude: lat,
+      longitude: lon,
+      current_weather: true,
+    };
+
     const {
       data: {
-        current_weather: { temperature },
+        current_weather: { temperature, weathercode },
       },
-      country,
-    } = await this.fetchDataApi.getDataFromApi(countryName);
+    } = await this.fetchDataApi.getDataFromApi(fetchDataApiParams);
 
-    if (country.toLowerCase() !== countryName.toLowerCase()) {
-      throw new HttpException(
-        `It is not a country: ${countryName}`,
-        HttpStatus.BAD_REQUEST,
-      );
-    }
     return {
-      country,
-      avgTemperatue: temperature,
+      location: locationParam,
+      avgTemperature: temperature,
+      weather: this.tools.getWeatherCode(weathercode),
     };
   }
 }
