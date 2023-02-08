@@ -11,8 +11,8 @@ import {
 
 @Injectable()
 export class FetchDataApiService {
-  private readonly weatherUrl;
-  private readonly geoUrl;
+  private readonly weatherUrl: string;
+  private readonly geoUrl: string;
 
   constructor(
     private readonly httpService: HttpService,

@@ -1,11 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { GetService } from 'src/get/services/get/get.service';
 import {
-  GetWeatherResponse,
-  GetLocationParam,
-  GetRouteLocationParam,
+  WeatherResponse,
   GetRouteCountryParam,
   GetRouteCityParam,
+  LocationNameParam,
+  CoordinatesParam,
 } from 'src/get/types/get.types';
 import { LocationType } from 'src/prediction/types/prediction.types';
 
@@ -16,34 +16,38 @@ export class GetController {
   @Get('country/:country')
   async getWeatherForCountry(
     @Param() { country }: GetRouteCountryParam,
-  ): Promise<GetWeatherResponse> {
-    const getRouteLocationParam: GetRouteLocationParam = {
+  ): Promise<WeatherResponse> {
+    const locationNameParam: LocationNameParam = {
       locationType: LocationType.Country,
-      locationParam: country,
+      locationName: country,
     };
-    return this.getService.getCurrentWeather(getRouteLocationParam);
+    return this.getService.getCurrentWeatherWithoutCoordinates(
+      locationNameParam,
+    );
   }
 
   @Get('city/:city')
   async getWeatherForCity(
     @Param() { city }: GetRouteCityParam,
-  ): Promise<GetWeatherResponse> {
-    const getRouteLocationParam: GetRouteLocationParam = {
+  ): Promise<WeatherResponse> {
+    const locationNameParam: LocationNameParam = {
       locationType: LocationType.City,
-      locationParam: city,
+      locationName: city,
     };
-    return this.getService.getCurrentWeather(getRouteLocationParam);
+    return this.getService.getCurrentWeatherWithoutCoordinates(
+      locationNameParam,
+    );
   }
 
   @Get('location/:lat/:lon')
   async getLocationWeather(
     @Param('lat') lat: number,
     @Param('lon') lon: number,
-  ): Promise<GetWeatherResponse> {
-    const getRouteLocationParam: GetRouteLocationParam = {
-      locationType: LocationType.Geo,
-      locationParam: { lat, lon },
+  ): Promise<WeatherResponse> {
+    const coordinatesParam: CoordinatesParam = {
+      lat,
+      lon,
     };
-    return this.getService.getCurrentWeather(getRouteLocationParam);
+    return this.getService.getCurrentWeatherWithCoordinates(coordinatesParam);
   }
 }

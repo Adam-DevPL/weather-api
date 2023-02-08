@@ -1,4 +1,4 @@
-import { IsAlpha, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsAlpha, IsNotEmpty, IsString } from 'class-validator';
 import {
   GeoCoordinates,
   LocationType,
@@ -18,24 +18,22 @@ export class GetRouteCityParam {
   city: string;
 }
 
-export class GetLocationParam {
-  @IsNumber()
+export type LocationNameParam = {
+  locationType: LocationType.City | LocationType.Country;
+  locationName: string;
+};
+
+export type CoordinatesParam = {
   lat: number;
-  @IsNumber()
   lon: number;
-}
+};
 
-export type GetRouteLocationParam =
-  | {
-      locationType: LocationType.Geo;
-      locationParam: GeoCoordinates;
-    }
-  | {
-      locationType: LocationType.City | LocationType.Country;
-      locationParam: string;
-    };
+export type ApiResponse = {
+  avgTemperature: number;
+  weather: string;
+};
 
-export type GetWeatherResponse = {
+export type WeatherResponse = {
   location: string | GeoCoordinates;
   avgTemperature: number;
   weather: string;

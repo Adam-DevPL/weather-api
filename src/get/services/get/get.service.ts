@@ -1,7 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
-  GetWeatherResponse,
-  GetRouteLocationParam,
+  WeatherResponse,
+  LocationNameParam,
+  CoordinatesParam,
+  ApiResponse,
 } from 'src/get/types/get.types';
 import { LocationType } from 'src/prediction/types/prediction.types';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
@@ -11,37 +13,59 @@ import { ToolsService } from 'src/tools/tools.service';
 @Injectable()
 export class GetService {
   constructor(
-    private fetchDataApi: FetchDataApiService,
-    private tools: ToolsService,
+    private readonly fetchDataApi: FetchDataApiService,
+    private readonly tools: ToolsService,
   ) {}
 
-  public async getCurrentWeather({
+  public async getCurrentWeatherWithoutCoordinates({
     locationType,
-    locationParam,
-  }: GetRouteLocationParam): Promise<GetWeatherResponse> {
-    let lon: number;
-    let lat: number;
+    locationName,
+  }: LocationNameParam): Promise<WeatherResponse> {
+    const { latitude, longitude, location } =
+      await this.fetchDataApi.getGeoLocation(locationName);
 
-    if (locationType !== LocationType.Geo) {
-      const { latitude, longitude, location } =
-        await this.fetchDataApi.getGeoLocation(locationParam);
-
-      if (locationType !== location) {
-        throw new HttpException(
-          `It is not a ${LocationType[locationType]}: ${locationParam}`,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      lat = latitude;
-      lon = longitude;
-    } else {
-      lat = locationParam.lat;
-      lon = locationParam.lon;
+    if (locationType !== location) {
+      throw new HttpException(
+        `It is not a ${LocationType[locationType]}: ${locationName}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
+    const { avgTemperature, weather }: ApiResponse = await this.getApiData(
+      latitude,
+      longitude,
+    );
+
+    return {
+      location: locationName,
+      avgTemperature,
+      weather,
+    };
+  }
+
+  public async getCurrentWeatherWithCoordinates({
+    lat,
+    lon,
+  }: CoordinatesParam): Promise<WeatherResponse> {
+    const { avgTemperature, weather }: ApiResponse = await this.getApiData(
+      lat,
+      lon,
+    );
+
+    return {
+      location: { lat, lon },
+      avgTemperature,
+      weather,
+    };
+  }
+
+  private async getApiData(
+    latitude: number,
+    longitude: number,
+  ): Promise<ApiResponse> {
     const fetchDataApiParams: FetchDataApiParams = {
-      latitude: lat,
-      longitude: lon,
+      latitude,
+      longitude,
       current_weather: true,
     };
 
@@ -52,7 +76,6 @@ export class GetService {
     } = await this.fetchDataApi.getDataFromApi(fetchDataApiParams);
 
     return {
-      location: locationParam,
       avgTemperature: temperature,
       weather: this.tools.getWeatherCode(weathercode),
     };
