@@ -287,5 +287,33 @@ describe('PredictionService', () => {
         ],
       });
     });
+
+    it('should throw error when problem with external api occur', async () => {
+      //given
+      const coordinatesInputDates: CoordinatesInputDates = {
+        lat: 20,
+        lon: 20,
+        from: '2023-02-15',
+        to: '2023-02-17',
+      };
+
+      jest.spyOn(service, <any>'getDataApi').mockImplementation(() => {
+        throw new HttpException(
+          'Internal server error',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
+
+      try {
+        //when
+        await service.getForecastForGeoLocationInDateRange(
+          coordinatesInputDates,
+        );
+      } catch (error) {
+        //then
+        expect(error.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
+        expect(error.message).toBe('Internal server error');
+      }
+    });
   });
 });

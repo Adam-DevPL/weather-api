@@ -123,18 +123,25 @@ export class PredictionService {
       hourly: 'temperature_2m,weathercode',
     };
 
-    const {
-      data: {
-        hourly: { time, temperature_2m, weathercode },
-      },
-    }: OpenModelResponse = await this.fetchDataApi.getDataFromApi(
-      fetchDataApiParams,
-    );
+    try {
+      const {
+        data: {
+          hourly: { time, temperature_2m, weathercode },
+        },
+      }: OpenModelResponse = await this.fetchDataApi.getDataFromApi(
+        fetchDataApiParams,
+      );
 
-    return {
-      timeArr: time,
-      temperatureArr: temperature_2m,
-      weatherCodeArr: weathercode,
-    } as ApiResponsePredictRoute;
+      return {
+        timeArr: time,
+        temperatureArr: temperature_2m,
+        weatherCodeArr: weathercode,
+      } as ApiResponsePredictRoute;
+    } catch (error) {
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
