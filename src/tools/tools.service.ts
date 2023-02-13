@@ -1,4 +1,11 @@
 import { Injectable } from '@nestjs/common';
+import { WeatherInfo } from 'src/prediction/types/prediction.types';
+
+type DataElement = {
+  time: string;
+  temperature: number;
+  weatherCode: number;
+};
 
 @Injectable()
 export class ToolsService {
@@ -13,6 +20,41 @@ export class ToolsService {
         return a;
       }, {}),
     ).reduce((a, v) => (v[1] >= a[1] ? v : a), [null, 0])[0];
+
+  public convertApiData = (
+    timeArr: string[],
+    temperatureArr: number[],
+    weatherCodeArr: number[],
+  ): WeatherInfo[] => {
+    return Object.values(
+      timeArr
+        .map((element, index) => ({
+          time: element.slice(0, element.indexOf('T')),
+          temperature: temperatureArr[index],
+          weatherCode: weatherCodeArr[index],
+        }))
+        .reduce((acc, { time, temperature, weatherCode }) => {
+          acc[time] = [
+            ...(acc[time] || []),
+            { time, temperature, weatherCode },
+          ];
+          return acc;
+        }, {}),
+    ).map((element: DataElement[]) => {
+      const avgTemperature = (
+        element.reduce((sum, { temperature }) => sum + temperature, 0) /
+        element.length
+      ).toFixed(1);
+      const mostFrequentWeatherCode = this.mostFrequent(
+        element.map(({ weatherCode }) => weatherCode),
+      );
+      return {
+        day: element[0].time,
+        avgTemperature,
+        weather: this.getWeatherCode(Number(mostFrequentWeatherCode)),
+      };
+    });
+  };
 
   public getWeatherCode = (code: number): string => {
     switch (code) {

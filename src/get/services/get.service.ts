@@ -1,14 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import {
-  WeatherResponse,
-  LocationNameParam,
-  CoordinatesParam,
-  ApiResponse,
-} from 'src/get/types/get.types';
-import { LocationType } from 'src/prediction/types/prediction.types';
+import { WeatherResponse, ApiResponse } from 'src/get/types/get.types';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
 import { FetchDataApiParams } from 'src/fetch-data-api/types/FetchDataApi.types';
 import { ToolsService } from 'src/tools/tools.service';
+import {
+  CoordinatesInput,
+  LocationNameInput,
+  LocationType,
+} from 'src/types/app.types';
 
 @Injectable()
 export class GetService {
@@ -20,7 +19,7 @@ export class GetService {
   public async getCurrentWeatherWithoutCoordinates({
     locationType,
     locationName,
-  }: LocationNameParam): Promise<WeatherResponse> {
+  }: LocationNameInput): Promise<WeatherResponse> {
     const { latitude, longitude, location } =
       await this.fetchDataApi.getGeoLocation(locationName);
 
@@ -40,23 +39,23 @@ export class GetService {
       location: locationName,
       avgTemperature,
       weather,
-    };
+    } as WeatherResponse;
   }
 
   public async getCurrentWeatherWithCoordinates({
     lat,
     lon,
-  }: CoordinatesParam): Promise<WeatherResponse> {
+  }: CoordinatesInput): Promise<WeatherResponse> {
     const { avgTemperature, weather }: ApiResponse = await this.getApiData(
       lat,
       lon,
     );
 
     return {
-      location: { lat, lon },
+      location: { latitude: lat, longitude: lon },
       avgTemperature,
       weather,
-    };
+    } as WeatherResponse;
   }
 
   private async getApiData(
@@ -78,6 +77,6 @@ export class GetService {
     return {
       avgTemperature: temperature,
       weather: this.tools.getWeatherCode(weathercode),
-    };
+    } as ApiResponse;
   }
 }

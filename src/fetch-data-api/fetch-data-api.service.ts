@@ -3,7 +3,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { firstValueFrom } from 'rxjs';
-import { LocationType } from 'src/prediction/types/prediction.types';
+import { LocationType } from 'src/types/app.types';
 import {
   FetchDataApiGeoResponse,
   FetchDataApiParams,

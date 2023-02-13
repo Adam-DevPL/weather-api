@@ -1,4 +1,4 @@
-import { LocationType } from 'src/prediction/types/prediction.types';
+import { LocationType } from 'src/types/app.types';
 
 export type FetchDataApiParams = {
   latitude: number;

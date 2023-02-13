@@ -1,16 +1,19 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
-  LocationType,
+  ApiResponsePredictRoute,
+  ForecastResponse,
   OpenModelResponse,
-  PredictionDataObject,
-  PredictionForecastResponse,
-  PredictionRouteLocationDateRangeParams,
-  PredictionRouteLocationSingleDayParam,
   WeatherInfo,
 } from 'src/prediction/types/prediction.types';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
 import { FetchDataApiParams } from 'src/fetch-data-api/types/FetchDataApi.types';
 import { ToolsService } from 'src/tools/tools.service';
+import {
+  CoordinatesInputDates,
+  LocationNameInputDates,
+  LocationNameInputDay,
+  LocationType,
+} from 'src/types/app.types';
 
 @Injectable()
 export class PredictionService {
@@ -23,7 +26,7 @@ export class PredictionService {
     day,
     locationName,
     locationType,
-  }: PredictionRouteLocationSingleDayParam): Promise<PredictionForecastResponse> {
+  }: LocationNameInputDay): Promise<ForecastResponse> {
     const { latitude, longitude, location } =
       await this.fetchDataApi.getGeoLocation(locationName);
 
@@ -34,66 +37,89 @@ export class PredictionService {
       );
     }
 
-    const fetchDataApiParams: FetchDataApiParams = {
-      latitude,
-      longitude,
-      start_date: day,
-      end_date: day,
-      hourly: 'temperature_2m,weathercode',
-    };
+    const { temperatureArr, weatherCodeArr }: ApiResponsePredictRoute =
+      await this.getDataApi(latitude, longitude, day, day);
 
-    const {
-      data: {
-        hourly: { temperature_2m, weathercode },
-      },
-    } = await this.fetchDataApi.getDataFromApi(fetchDataApiParams);
+    const avgTemperature: string = this.tools
+      .getAverage(temperatureArr)
+      .toFixed(1);
 
-    const avgTemperature: string = (
-      temperature_2m.reduce((a: number, b: number) => a + b, 0) /
-      temperature_2m.length
-    ).toFixed(1);
-
-    const weatherCode = this.tools.getWeatherCode(
-      Number(this.tools.mostFrequent(weathercode)),
+    const weatherCode: string = this.tools.getWeatherCode(
+      Number(this.tools.mostFrequent(weatherCodeArr)),
     );
 
     return {
       location: locationName,
       weatherInfo: { day: day, avgTemperature, weather: weatherCode },
-    };
+    } as ForecastResponse;
   }
 
-  public async getForecastForLocationInDateRange({
+  public async getForecastForCountryOrCityInDateRange({
     locationType,
-    locationParam,
+    locationName,
     from,
     to,
-  }: PredictionRouteLocationDateRangeParams) {
-    let lat: number;
-    let lon: number;
+  }: LocationNameInputDates): Promise<ForecastResponse> {
+    const { latitude, longitude, location } =
+      await this.fetchDataApi.getGeoLocation(locationName);
 
-    if (locationType !== LocationType.Geo) {
-      const { latitude, longitude, location } =
-        await this.fetchDataApi.getGeoLocation(locationParam);
-
-      if (locationType !== location) {
-        throw new HttpException(
-          `It is not a ${LocationType[locationType]}: ${locationParam}`,
-          HttpStatus.BAD_REQUEST,
-        );
-      }
-      lat = latitude;
-      lon = longitude;
-    } else {
-      lat = locationParam.lat;
-      lon = locationParam.lon;
+    if (locationType !== location) {
+      throw new HttpException(
+        `It is not a ${LocationType[locationType]}: ${locationName}`,
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
+    const { timeArr, temperatureArr, weatherCodeArr }: ApiResponsePredictRoute =
+      await this.getDataApi(latitude, longitude, from, to);
+
+    const weatherInfo: WeatherInfo[] = this.tools.convertApiData(
+      timeArr,
+      temperatureArr,
+      weatherCodeArr,
+    );
+
+    return {
+      location: locationName,
+      weatherInfo,
+    } as ForecastResponse;
+  }
+
+  public async getForecastForGeoLocationInDateRange({
+    lat,
+    lon,
+    from,
+    to,
+  }: CoordinatesInputDates) {
+    const { timeArr, temperatureArr, weatherCodeArr }: ApiResponsePredictRoute =
+      await this.getDataApi(lat, lon, from, to);
+
+    const weatherInfo: WeatherInfo[] = this.tools.convertApiData(
+      timeArr,
+      temperatureArr,
+      weatherCodeArr,
+    );
+
+    return {
+      location: {
+        latitude: lat,
+        longitude: lon,
+      },
+      weatherInfo,
+    } as ForecastResponse;
+  }
+
+  private async getDataApi(
+    latitude: number,
+    longitude: number,
+    start_date: string,
+    end_date: string,
+  ): Promise<ApiResponsePredictRoute> {
     const fetchDataApiParams: FetchDataApiParams = {
-      latitude: lat,
-      longitude: lon,
-      start_date: from,
-      end_date: to,
+      latitude,
+      longitude,
+      start_date,
+      end_date,
       hourly: 'temperature_2m,weathercode',
     };
 
@@ -105,36 +131,10 @@ export class PredictionService {
       fetchDataApiParams,
     );
 
-    const outputArr = time.map((element, index) => {
-      const tmp: PredictionDataObject = {
-        time: element.slice(0, element.indexOf('T')),
-        temperature: temperature_2m[index],
-        weatherCode: weathercode[index],
-      };
-      return tmp;
-    });
-
-    const grouped: Array<WeatherInfo> = Object.values(
-      outputArr.reduce((acc, item) => {
-        acc[item.time] = [...(acc[item.time] || []), item];
-        return acc;
-      }, {}),
-    ).map((element: PredictionDataObject[]) => {
-      const temperature = element.map((e) => e.temperature);
-      const weatherCode = element.map((e) => e.weatherCode);
-      const tmp: WeatherInfo = {
-        day: element[0].time,
-        avgTemperature: this.tools.getAverage(temperature).toFixed(1),
-        weather: this.tools.getWeatherCode(
-          Number(this.tools.mostFrequent(weatherCode)),
-        ),
-      };
-      return tmp;
-    });
-
     return {
-      location: locationParam,
-      weatherInfo: grouped,
-    };
+      timeArr: time,
+      temperatureArr: temperature_2m,
+      weatherCodeArr: weathercode,
+    } as ApiResponsePredictRoute;
   }
 }

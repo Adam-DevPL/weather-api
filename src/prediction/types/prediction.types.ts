@@ -1,4 +1,6 @@
-export type PredictionForecastResponse = {
+import { GeoCoordinates } from 'src/types/app.types';
+
+export type ForecastResponse = {
   location: string | GeoCoordinates;
   weatherInfo: WeatherInfo | WeatherInfo[];
 };
@@ -9,43 +11,6 @@ export type WeatherInfo = {
   weather: string;
 };
 
-export type PredictionRouteLocationSingleDayParam = {
-  day: string;
-  locationType: LocationType;
-  locationName: string;
-};
-
-export type PredictionRouteLocationDateRangeParams =
-  | {
-      locationType: LocationType.Geo;
-      locationParam: GeoCoordinates;
-      from: string;
-      to: string;
-    }
-  | {
-      locationType: LocationType.City | LocationType.Country;
-      locationParam: string;
-      from: string;
-      to: string;
-    };
-
-export type GeoCoordinates = {
-  lat: number;
-  lon: number;
-};
-
-export enum LocationType {
-  City,
-  Country,
-  Geo,
-}
-
-export type PredictionDataObject = {
-  time: string;
-  temperature: number;
-  weatherCode: number;
-};
-
 export type OpenModelResponse = {
   data: {
     hourly: {
@@ -54,4 +19,10 @@ export type OpenModelResponse = {
       weathercode: number[];
     };
   };
+};
+
+export type ApiResponsePredictRoute = {
+  timeArr: string[];
+  temperatureArr: number[];
+  weatherCodeArr: number[];
 };

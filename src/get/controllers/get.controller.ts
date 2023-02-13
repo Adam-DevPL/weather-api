@@ -1,14 +1,16 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { GetService } from 'src/get/services/get/get.service';
+import { GetService } from 'src/get/services/get.service';
+import { WeatherResponse } from 'src/get/types/get.types';
 import {
-  GetRouteCountryParam,
-  GetRouteCityParam,
-  LocationNameParam,
-  CoordinatesParam,
-  WeatherResponse,
+  CoordinatesInput,
+  LocationNameInput,
+  LocationType,
+} from 'src/types/app.types';
+import {
+  CityParam,
+  CountryParam,
   GeoCoordinatesParam,
-} from 'src/get/types/get.types';
-import { LocationType } from 'src/prediction/types/prediction.types';
+} from 'src/Validation/ValidationClass';
 
 @Controller('weather/get')
 export class GetController {
@@ -17,9 +19,9 @@ export class GetController {
 
   @Get('country/:country')
   async getWeatherForCountry(
-    @Param() { country }: GetRouteCountryParam,
+    @Param() { country }: CountryParam,
   ): Promise<WeatherResponse> {
-    const locationNameParam: LocationNameParam = {
+    const locationNameParam: LocationNameInput = {
       locationType: LocationType.Country,
       locationName: country,
     };
@@ -30,9 +32,9 @@ export class GetController {
 
   @Get('city/:city')
   async getWeatherForCity(
-    @Param() { city }: GetRouteCityParam,
+    @Param() { city }: CityParam,
   ): Promise<WeatherResponse> {
-    const locationNameParam: LocationNameParam = {
+    const locationNameParam: LocationNameInput = {
       locationType: LocationType.City,
       locationName: city,
     };
@@ -45,7 +47,7 @@ export class GetController {
   async getLocationWeather(
     @Param() { lat, lon }: GeoCoordinatesParam,
   ): Promise<WeatherResponse> {
-    const coordinatesParam: CoordinatesParam = {
+    const coordinatesParam: CoordinatesInput = {
       lat,
       lon,
     };

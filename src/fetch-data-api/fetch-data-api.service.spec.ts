@@ -1,3 +1,6 @@
+import { HttpModule } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { FetchDataApiService } from './fetch-data-api.service';
 
@@ -6,7 +9,8 @@ describe('FetchDataApiService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [FetchDataApiService],
+      imports: [HttpModule],
+      providers: [FetchDataApiService, ConfigService],
     }).compile();
 
     service = module.get<FetchDataApiService>(FetchDataApiService);
