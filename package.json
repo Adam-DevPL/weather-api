@@ -22,6 +22,7 @@
   "dependencies": {
     "@nestjs/axios": "^1.0.1",
     "@nestjs/common": "^9.0.0",
+    "@nestjs/config": "^2.3.0",
     "@nestjs/core": "^9.0.0",
     "@nestjs/platform-express": "^9.0.0",
     "class-transformer": "^0.5.1",
@@ -67,6 +68,9 @@
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    }
   }
 }
