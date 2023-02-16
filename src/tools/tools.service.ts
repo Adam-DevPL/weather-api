@@ -9,6 +9,9 @@ type DataElement = {
 
 @Injectable()
 export class ToolsService {
+  public checkDatesRange = (from: string, to: string): boolean =>
+    new Date(to).getTime() - new Date(from).getTime() < 0;
+
   public getAverage = (arr: number[]): number => {
     return arr.reduce((acc, item) => acc + item, 0) / arr.length;
   };

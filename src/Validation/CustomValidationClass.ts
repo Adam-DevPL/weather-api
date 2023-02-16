@@ -14,10 +14,7 @@ export class CustomDateRange implements ValidatorConstraintInterface {
       new Date(now.getTime() + 7 * day).toDateString(),
     );
 
-    const datesRange = dateParam > minRangeDate && dateParam <= maxDateRange;
-    const datesSequence = maxDateRange.getTime() - minRangeDate.getTime() > 0;
-
-    return datesRange && datesSequence;
+    return dateParam > minRangeDate && dateParam <= maxDateRange;
   }
 
   defaultMessage() {

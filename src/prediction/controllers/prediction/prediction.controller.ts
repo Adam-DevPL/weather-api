@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { PredictionService } from 'src/prediction/services/prediction/prediction.service';
 import { ForecastResponse } from 'src/prediction/types/prediction.types';
+import { ToolsService } from 'src/tools/tools.service';
 import {
   CoordinatesInputDates,
   LocationNameInputDates,
@@ -23,7 +24,10 @@ import {
 
 @Controller('weather/prediction')
 export class PredictionController {
-  constructor(private predictionService: PredictionService) {}
+  constructor(
+    private predictionService: PredictionService,
+    private toolsService: ToolsService,
+  ) {}
 
   @Get('country/:day/:country')
   getForecastForCountry(
@@ -54,6 +58,12 @@ export class PredictionController {
   getForecastForCountryInDateRange(
     @Param() { country, from, to }: CountryDatesRangeParam,
   ): Promise<ForecastResponse> {
+    if (this.toolsService.checkDatesRange(from, to)) {
+      throw new HttpException(
+        'Invalid dates order. Date "from" is later then "to" date',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const locationNameInputDates: LocationNameInputDates = {
       locationType: LocationType.Country,
       locationName: country,
@@ -70,8 +80,11 @@ export class PredictionController {
   getForecastForCityInDateRange(
     @Param() { city, from, to }: CityDatesRangeParam,
   ): Promise<ForecastResponse> {
-    if (!from || !to) {
-      throw new HttpException(`Invalid date`, HttpStatus.BAD_REQUEST);
+    if (this.toolsService.checkDatesRange(from, to)) {
+      throw new HttpException(
+        'Invalid dates order. Date "from" is later then "to" date',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const locationNameInputDates: LocationNameInputDates = {
@@ -90,6 +103,12 @@ export class PredictionController {
   getForecastForCoordinatesInDateRange(
     @Param() { lat, lon, from, to }: GeoCoordinatesDatesRangeParam,
   ): Promise<ForecastResponse> {
+    if (this.toolsService.checkDatesRange(from, to)) {
+      throw new HttpException(
+        'Invalid dates order. Date "from" is later then "to" date',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
     const coordinatesInputDates: CoordinatesInputDates = {
       lat,
       lon,

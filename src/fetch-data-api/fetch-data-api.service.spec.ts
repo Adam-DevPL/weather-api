@@ -2,6 +2,7 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 
 import { Test, TestingModule } from '@nestjs/testing';
+import { LocationType } from 'src/types/app.types';
 import { FetchDataApiService } from './fetch-data-api.service';
 
 describe('FetchDataApiService', () => {
