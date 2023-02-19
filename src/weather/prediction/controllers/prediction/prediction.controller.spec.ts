@@ -7,13 +7,13 @@ import { ToolsService } from 'src/tools/tools.service';
 import { PredictionService } from 'src/prediction/services/prediction/prediction.service';
 import { ForecastResponse } from 'src/prediction/types/prediction.types';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { LocationType } from 'src/types/app.types';
+import { LocationType } from 'src/weather/types/weather.types';
 import {
   CityDayParam,
   CountryDatesRangeParam,
   CountryDayParam,
   GeoCoordinatesDatesRangeParam,
-} from 'src/Validation/ValidationClass';
+} from 'src/Validation/validation.module';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 
@@ -70,7 +70,7 @@ describe('PredictionController', () => {
       //given
       jest.spyOn(service, 'getForecastForSingleDay').mockImplementation(() => {
         throw new HttpException(
-          `It is not a ${LocationType[LocationType.Country]}: invalidCountry`,
+          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
           HttpStatus.BAD_REQUEST,
         );
       });
@@ -85,7 +85,7 @@ describe('PredictionController', () => {
         //then
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.Country]}: invalidCountry`,
+          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
         );
       }
     });
@@ -174,7 +174,7 @@ describe('PredictionController', () => {
       //given
       jest.spyOn(service, 'getForecastForSingleDay').mockImplementation(() => {
         throw new HttpException(
-          `It is not a ${LocationType[LocationType.City]}: invalidCity`,
+          `It is not a ${LocationType[LocationType.CITY]}: invalidCity`,
           HttpStatus.BAD_REQUEST,
         );
       });
@@ -189,7 +189,7 @@ describe('PredictionController', () => {
         //then
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.City]}: invalidCity`,
+          `It is not a ${LocationType[LocationType.CITY]}: invalidCity`,
         );
       }
     });
@@ -294,7 +294,7 @@ describe('PredictionController', () => {
         .spyOn(service, 'getForecastForCountryOrCityInDateRange')
         .mockImplementation(() => {
           throw new HttpException(
-            `It is not a ${LocationType[LocationType.Country]}: invalidCountry`,
+            `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
             HttpStatus.BAD_REQUEST,
           );
         });
@@ -310,7 +310,7 @@ describe('PredictionController', () => {
         //then
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.Country]}: invalidCountry`,
+          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
         );
       }
     });

@@ -13,7 +13,7 @@ import {
   LocationNameInputDates,
   LocationNameInputDay,
   LocationType,
-} from 'src/types/app.types';
+} from 'src/weather/types/weather.types';
 
 @Injectable()
 export class PredictionService {

@@ -13,14 +13,14 @@ import {
   LocationNameInputDates,
   LocationNameInputDay,
   LocationType,
-} from 'src/types/app.types';
+} from 'src/weather/types/weather.types';
 import {
   CityDatesRangeParam,
   CityDayParam,
   CountryDatesRangeParam,
   CountryDayParam,
   GeoCoordinatesDatesRangeParam,
-} from 'src/Validation/ValidationClass';
+} from 'src/Validation/validation.module';
 
 @Controller('weather/prediction')
 export class PredictionController {
@@ -36,7 +36,7 @@ export class PredictionController {
     const locationNameInputDay: LocationNameInputDay = {
       day,
       locationName: country,
-      locationType: LocationType.Country,
+      locationType: LocationType.COUNTRY,
     };
 
     return this.predictionService.getForecastForSingleDay(locationNameInputDay);
@@ -48,7 +48,7 @@ export class PredictionController {
     const locationNameInputDay: LocationNameInputDay = {
       day,
       locationName: city,
-      locationType: LocationType.City,
+      locationType: LocationType.CITY,
     };
 
     return this.predictionService.getForecastForSingleDay(locationNameInputDay);
@@ -65,7 +65,7 @@ export class PredictionController {
       );
     }
     const locationNameInputDates: LocationNameInputDates = {
-      locationType: LocationType.Country,
+      locationType: LocationType.COUNTRY,
       locationName: country,
       from,
       to,
@@ -88,7 +88,7 @@ export class PredictionController {
     }
 
     const locationNameInputDates: LocationNameInputDates = {
-      locationType: LocationType.City,
+      locationType: LocationType.CITY,
       locationName: city,
       from,
       to,

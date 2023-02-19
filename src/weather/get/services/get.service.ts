@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { WeatherResponse, ApiResponse } from 'src/get/types/get.types';
+import { WeatherResponse, ApiResponse } from 'src/weather/types/get.types';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
 import { FetchDataApiParams } from 'src/fetch-data-api/types/FetchDataApi.types';
 import { ToolsService } from 'src/tools/tools.service';
@@ -7,7 +7,7 @@ import {
   CoordinatesInput,
   LocationNameInput,
   LocationType,
-} from 'src/types/app.types';
+} from 'src/weather/types/weather.types';
 
 @Injectable()
 export class GetService {

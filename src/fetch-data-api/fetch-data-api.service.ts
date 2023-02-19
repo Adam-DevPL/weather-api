@@ -3,7 +3,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { firstValueFrom } from 'rxjs';
-import { LocationType } from 'src/types/app.types';
+import { LocationType } from 'src/weather/types/weather.types';
 import {
   FetchDataApiGeoResponse,
   FetchDataApiParams,
@@ -86,8 +86,8 @@ export class FetchDataApiService {
         longitude,
         location:
           country.toLowerCase() === name.toLowerCase()
-            ? LocationType.Country
-            : LocationType.City,
+            ? LocationType.COUNTRY
+            : LocationType.CITY,
       };
     } catch ({ response }) {
       throw new HttpException(

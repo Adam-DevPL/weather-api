@@ -10,7 +10,7 @@ import {
 import {
   CustomCoordinatesRange,
   CustomDateRange,
-} from './CustomValidationClass';
+} from './custum-validators/CustomValidationClass';
 
 export class CountryParam {
   @IsNotEmpty()

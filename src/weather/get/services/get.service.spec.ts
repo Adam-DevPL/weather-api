@@ -8,7 +8,7 @@ import {
   CoordinatesInput,
   LocationNameInput,
   LocationType,
-} from 'src/types/app.types';
+} from 'src/weather/types/weather.types';
 import { HttpException, HttpStatus } from '@nestjs/common';
 
 describe('GetService', () => {
@@ -33,14 +33,14 @@ describe('GetService', () => {
     it('should return a weather resposne for country', async () => {
       //given
       const locationNameParam: LocationNameInput = {
-        locationType: LocationType.Country,
+        locationType: LocationType.COUNTRY,
         locationName: 'Poland',
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockResolvedValue({
         latitude: 52,
         longitude: 20,
-        location: LocationType.Country,
+        location: LocationType.COUNTRY,
       });
 
       jest
@@ -63,14 +63,14 @@ describe('GetService', () => {
     it('should return a weather resposne for city', async () => {
       //given
       const locationNameParam: LocationNameInput = {
-        locationType: LocationType.City,
+        locationType: LocationType.CITY,
         locationName: 'City',
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockResolvedValue({
         latitude: 52,
         longitude: 20,
-        location: LocationType.City,
+        location: LocationType.CITY,
       });
 
       jest
@@ -93,21 +93,21 @@ describe('GetService', () => {
     it('should throw error for invalid parameters, getting City instead of Country', async () => {
       //given
       const locationNameParam: LocationNameInput = {
-        locationType: LocationType.Country,
+        locationType: LocationType.COUNTRY,
         locationName: 'City',
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockResolvedValue({
         latitude: 52,
         longitude: 20,
-        location: LocationType.City,
+        location: LocationType.CITY,
       });
 
       jest
         .spyOn(service, 'getCurrentWeatherWithoutCoordinates')
         .mockImplementation(() => {
           throw new HttpException(
-            `It is not a ${LocationType[LocationType.Country]}: City`,
+            `It is not a ${LocationType[LocationType.COUNTRY]}: City`,
             HttpStatus.BAD_REQUEST,
           );
         });
@@ -119,7 +119,7 @@ describe('GetService', () => {
         //then
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.Country]}: City`,
+          `It is not a ${LocationType[LocationType.COUNTRY]}: City`,
         );
       }
     });
@@ -127,7 +127,7 @@ describe('GetService', () => {
     it('should throw error for invalid parameters - location name in invalid', async () => {
       //given
       const locationNameParam: LocationNameInput = {
-        locationType: LocationType.Country,
+        locationType: LocationType.COUNTRY,
         locationName: 'xxxxxx',
       };
 

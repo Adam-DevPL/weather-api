@@ -1,10 +1,10 @@
 import { HttpModule } from '@nestjs/axios';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
-import { GetService } from 'src/get/services/get.service';
-import { WeatherResponse } from 'src/get/types/get.types';
+import { GetService } from 'src/weather/get/services/get.service';
+import { WeatherResponse } from 'src/weather/types/get.types';
 import { ToolsService } from 'src/tools/tools.service';
-import { LocationType } from 'src/types/app.types';
+import { LocationType } from 'src/weather/types/weather.types';
 import { GetController } from './get.controller';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
@@ -13,7 +13,7 @@ import {
   CityParam,
   CountryParam,
   GeoCoordinatesParam,
-} from 'src/Validation/ValidationClass';
+} from 'src/Validation/validation.module';
 import { validate } from 'class-validator';
 
 describe('GetController', () => {
@@ -62,7 +62,7 @@ describe('GetController', () => {
         .spyOn(service, 'getCurrentWeatherWithoutCoordinates')
         .mockImplementation(() => {
           throw new HttpException(
-            `It is not a ${LocationType[LocationType.Country]}: invalidCountry`,
+            `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
             HttpStatus.BAD_REQUEST,
           );
         });
@@ -76,7 +76,7 @@ describe('GetController', () => {
         //then
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.Country]}: invalidCountry`,
+          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
         );
       }
     });
@@ -132,7 +132,7 @@ describe('GetController', () => {
         .spyOn(service, 'getCurrentWeatherWithoutCoordinates')
         .mockImplementation(() => {
           throw new HttpException(
-            `It is not a ${LocationType[LocationType.Country]}: invalidCity`,
+            `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCity`,
             HttpStatus.BAD_REQUEST,
           );
         });
@@ -146,7 +146,7 @@ describe('GetController', () => {
         //then
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.Country]}: invalidCity`,
+          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCity`,
         );
       }
     });

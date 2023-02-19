@@ -12,7 +12,7 @@ export type GeoCoordinates = {
 };
 
 export type LocationNameInput = {
-  locationType: LocationType.City | LocationType.Country;
+  locationType: LocationType.CITY | LocationType.COUNTRY;
   locationName: string;
 };
 
@@ -27,7 +27,7 @@ export type CoordinatesInput = {
 export type CoordinatesInputDates = CoordinatesInput & DatesRange;
 
 export enum LocationType {
-  City,
-  Country,
-  Geo,
+  CITY,
+  COUNTRY,
+  GEO,
 }

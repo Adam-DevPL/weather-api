@@ -1,16 +1,16 @@
 import { Controller, Get, Param } from '@nestjs/common';
-import { GetService } from 'src/get/services/get.service';
-import { WeatherResponse } from 'src/get/types/get.types';
+import { GetService } from 'src/weather/get/services/get.service';
+import { WeatherResponse } from 'src/weather/types/get.types';
 import {
   CoordinatesInput,
   LocationNameInput,
   LocationType,
-} from 'src/types/app.types';
+} from 'src/weather/types/weather.types';
 import {
   CityParam,
   CountryParam,
   GeoCoordinatesParam,
-} from 'src/Validation/ValidationClass';
+} from 'src/Validation/validation.module';
 
 @Controller('weather/get')
 export class GetController {
@@ -22,7 +22,7 @@ export class GetController {
     @Param() { country }: CountryParam,
   ): Promise<WeatherResponse> {
     const locationNameParam: LocationNameInput = {
-      locationType: LocationType.Country,
+      locationType: LocationType.COUNTRY,
       locationName: country,
     };
     return this.getService.getCurrentWeatherWithoutCoordinates(
@@ -35,7 +35,7 @@ export class GetController {
     @Param() { city }: CityParam,
   ): Promise<WeatherResponse> {
     const locationNameParam: LocationNameInput = {
-      locationType: LocationType.City,
+      locationType: LocationType.CITY,
       locationName: city,
     };
     return this.getService.getCurrentWeatherWithoutCoordinates(

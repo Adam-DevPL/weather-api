@@ -9,7 +9,7 @@ import {
   LocationNameInputDates,
   LocationNameInputDay,
   LocationType,
-} from 'src/types/app.types';
+} from 'src/weather/types/weather.types';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { temperature, time, weathercode } from './testData';
 
@@ -44,13 +44,13 @@ describe('PredictionService', () => {
       const locationNameInputDay: LocationNameInputDay = {
         day: '2023-02-15',
         locationName: 'country',
-        locationType: LocationType.Country,
+        locationType: LocationType.COUNTRY,
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockResolvedValue({
         latitude: 20,
         longitude: 20,
-        location: LocationType.Country,
+        location: LocationType.COUNTRY,
       });
 
       jest.spyOn(service, <any>'getDataApi').mockResolvedValue({
@@ -79,13 +79,13 @@ describe('PredictionService', () => {
       const locationNameInputDay: LocationNameInputDay = {
         day: '2023-02-15',
         locationName: 'city',
-        locationType: LocationType.City,
+        locationType: LocationType.CITY,
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockResolvedValue({
         latitude: 20,
         longitude: 20,
-        location: LocationType.City,
+        location: LocationType.CITY,
       });
 
       jest.spyOn(service, <any>'getDataApi').mockResolvedValue({
@@ -114,18 +114,18 @@ describe('PredictionService', () => {
       const locationNameInputDay: LocationNameInputDay = {
         day: '2023-02-15',
         locationName: 'city',
-        locationType: LocationType.Country,
+        locationType: LocationType.COUNTRY,
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockResolvedValue({
         latitude: 20,
         longitude: 20,
-        location: LocationType.City,
+        location: LocationType.CITY,
       });
 
       jest.spyOn(service, 'getForecastForSingleDay').mockImplementation(() => {
         throw new HttpException(
-          `It is not a ${LocationType[LocationType.Country]}: City`,
+          `It is not a ${LocationType[LocationType.COUNTRY]}: City`,
           HttpStatus.BAD_REQUEST,
         );
       });
@@ -137,7 +137,7 @@ describe('PredictionService', () => {
         //then
         expect(error.status).toBe(HttpStatus.BAD_REQUEST);
         expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.Country]}: City`,
+          `It is not a ${LocationType[LocationType.COUNTRY]}: City`,
         );
       }
     });
@@ -147,7 +147,7 @@ describe('PredictionService', () => {
       const locationNameInputDay: LocationNameInputDay = {
         day: '2023-02-15',
         locationName: 'xxxxx',
-        locationType: LocationType.City,
+        locationType: LocationType.CITY,
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockImplementation(() => {
@@ -169,7 +169,7 @@ describe('PredictionService', () => {
     it('should return weather info for a country/city in data range', async () => {
       //given
       const locationNameInputDates: LocationNameInputDates = {
-        locationType: LocationType.Country,
+        locationType: LocationType.COUNTRY,
         locationName: 'country',
         from: '2023-02-15',
         to: '2023-02-17',
@@ -178,7 +178,7 @@ describe('PredictionService', () => {
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockResolvedValue({
         latitude: 20,
         longitude: 20,
-        location: LocationType.Country,
+        location: LocationType.COUNTRY,
       });
 
       jest.spyOn(service, <any>'getDataApi').mockResolvedValue({
@@ -218,7 +218,7 @@ describe('PredictionService', () => {
     it('should throw error when unnamed country id dates range', async () => {
       //given
       const locationNameInputDates: LocationNameInputDates = {
-        locationType: LocationType.Country,
+        locationType: LocationType.COUNTRY,
         locationName: 'city',
         from: '2023-02-15',
         to: '2023-02-17',

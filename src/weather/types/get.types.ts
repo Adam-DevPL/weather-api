@@ -1,4 +1,4 @@
-import { GeoCoordinates } from 'src/types/app.types';
+import { GeoCoordinates } from 'src/weather/types/weather.types';
 
 export type ApiResponse = {
   avgTemperature: number;
