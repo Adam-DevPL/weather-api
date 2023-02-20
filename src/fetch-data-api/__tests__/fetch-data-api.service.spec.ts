@@ -1,11 +1,11 @@
-import { HttpModule, HttpService } from '@nestjs/axios';
+import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { of } from 'rxjs';
-import { FetchDataApiException } from 'src/filters/exceptions/fetch-data-api.exception';
 import { FetchDataApiService } from '../fetch-data-api.service';
+import { FetchDataApiParams } from '../types/FetchDataApi.types';
 
 describe('FetchDataApiService', () => {
   let service: FetchDataApiService;
@@ -56,20 +56,64 @@ describe('FetchDataApiService', () => {
         service.getGeoLocation(locationName),
       ).rejects.toMatchSnapshot();
     });
+
+    it('should throw error when problem with external api', async () => {
+      expect.assertions(1);
+      //given
+      const locationName = 'Poland';
+
+      jest.spyOn(httpService, 'get').mockImplementation(() => {
+        throw new HttpException('Invalid URL', HttpStatus.BAD_REQUEST);
+      });
+
+      //then
+      await expect(
+        service.getGeoLocation(locationName),
+      ).rejects.toMatchSnapshot();
+    });
   });
 
-  it('should throw error when problem with external api', async () => {
-    expect.assertions(1);
-    //given
-    const locationName = 'Poland';
+  describe('getDataFromApi', () => {
+    it('should throw error when invalid coordinates', async () => {
+      expect.assertions(1);
+      //given
+      const params: FetchDataApiParams = {
+        latitude: 200,
+        longitude: 200,
+        current_weather: true,
+      };
 
-    jest.spyOn(httpService, 'get').mockImplementation(() => {
-      throw new HttpException('Invalid URL', HttpStatus.BAD_REQUEST);
+      jest.spyOn(httpService, 'get').mockReturnValueOnce(
+        of({
+          data: {
+            error: 'invalid',
+          },
+          headers: {},
+          config: { url: 'mockGeoUrl' },
+          status: 200,
+          statusText: 'OK',
+        }) as any,
+      );
+
+      //then
+      await expect(service.getDataFromApi(params)).rejects.toMatchSnapshot();
     });
 
-    //then
-    await expect(
-      service.getGeoLocation(locationName),
-    ).rejects.toMatchSnapshot();
+    it('should throw error when problem with external api', async () => {
+      expect.assertions(1);
+      //given
+      const params: FetchDataApiParams = {
+        latitude: 200,
+        longitude: 200,
+        current_weather: true,
+      };
+
+      jest.spyOn(httpService, 'get').mockImplementation(() => {
+        throw new HttpException('Invalid URL', HttpStatus.BAD_REQUEST);
+      });
+
+      //then
+      await expect(service.getDataFromApi(params)).rejects.toMatchSnapshot();
+    });
   });
 });

@@ -3,7 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { firstValueFrom } from 'rxjs';
-import { FetchDataApiException } from 'src/filters/exceptions/fetch-data-api.exception';
+import {
+  CoordinatesException,
+  InternalServerException,
+  LocationException,
+} from 'src/filters/exceptions/exceptions';
 import { LocationType } from 'src/weather/types/weather.types';
 import {
   FetchDataApiGeoResponse,
@@ -30,14 +34,17 @@ export class FetchDataApiService {
       );
 
       if (data.error) {
-        throw new FetchDataApiException('Invalid coordinates');
+        throw new CoordinatesException('Invalid coordinates');
       }
 
       return {
         data,
       };
     } catch (error) {
-      throw new FetchDataApiException(error.message);
+      if (error instanceof CoordinatesException) {
+        throw new CoordinatesException(error.message);
+      }
+      throw new InternalServerException(error.message);
     }
   }
 
@@ -53,7 +60,7 @@ export class FetchDataApiService {
       );
 
       if (!data.hasOwnProperty('results')) {
-        throw new FetchDataApiException('Location not found');
+        throw new LocationException('Location not found');
       }
 
       const {
@@ -69,7 +76,10 @@ export class FetchDataApiService {
             : LocationType.CITY,
       };
     } catch (error) {
-      throw new FetchDataApiException(error.message);
+      if (error instanceof LocationException) {
+        throw new LocationException(error.message);
+      }
+      throw new InternalServerException(error.message);
     }
   }
 }
