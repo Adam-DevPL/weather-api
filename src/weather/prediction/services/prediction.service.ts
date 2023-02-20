@@ -1,13 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+
+import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
+import { FetchDataApiParams } from 'src/fetch-data-api/types/FetchDataApi.types';
+import { ToolsService } from 'src/tools/tools.service';
 import {
   ApiResponsePredictRoute,
   ForecastResponse,
   OpenModelResponse,
   WeatherInfo,
-} from 'src/prediction/types/prediction.types';
-import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
-import { FetchDataApiParams } from 'src/fetch-data-api/types/FetchDataApi.types';
-import { ToolsService } from 'src/tools/tools.service';
+} from 'src/weather/types/prediction.types';
 import {
   CoordinatesInputDates,
   LocationNameInputDates,

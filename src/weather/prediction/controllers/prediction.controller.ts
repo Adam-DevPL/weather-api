@@ -5,8 +5,7 @@ import {
   HttpStatus,
   Param,
 } from '@nestjs/common';
-import { PredictionService } from 'src/prediction/services/prediction/prediction.service';
-import { ForecastResponse } from 'src/prediction/types/prediction.types';
+
 import { ToolsService } from 'src/tools/tools.service';
 import {
   CoordinatesInputDates,
@@ -20,7 +19,9 @@ import {
   CountryDatesRangeParam,
   CountryDayParam,
   GeoCoordinatesDatesRangeParam,
-} from 'src/Validation/validation.module';
+} from 'src/validation/validation.module';
+import { PredictionService } from '../services/prediction.service';
+import { ForecastResponse } from 'src/weather/types/prediction.types';
 
 @Controller('weather/prediction')
 export class PredictionController {

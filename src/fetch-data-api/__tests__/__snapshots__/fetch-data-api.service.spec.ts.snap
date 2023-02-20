@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FetchDataApiService getGeoLocation should throw error when invalid location 1`] = `
+FetchDataApiException {
+  "message": "Location not found",
+}
+`;
+
+exports[`FetchDataApiService should throw error when problem with external api 1`] = `
+FetchDataApiException {
+  "message": "Invalid URL",
+}
+`;

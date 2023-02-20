@@ -1,11 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PredictionController } from './prediction.controller';
+import { PredictionController } from '../prediction.controller';
 import { ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
 import { ToolsService } from 'src/tools/tools.service';
-import { PredictionService } from 'src/prediction/services/prediction/prediction.service';
-import { ForecastResponse } from 'src/prediction/types/prediction.types';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { LocationType } from 'src/weather/types/weather.types';
 import {
@@ -13,9 +11,11 @@ import {
   CountryDatesRangeParam,
   CountryDayParam,
   GeoCoordinatesDatesRangeParam,
-} from 'src/Validation/validation.module';
+} from 'src/validation/validation.module';
 import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
+import { PredictionService } from '../../services/prediction.service';
+import { ForecastResponse } from 'src/weather/types/prediction.types';
 
 describe('PredictionController', () => {
   let controller: PredictionController;

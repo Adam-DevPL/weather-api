@@ -10,7 +10,7 @@ import {
   CityParam,
   CountryParam,
   GeoCoordinatesParam,
-} from 'src/Validation/validation.module';
+} from 'src/validation/validation.module';
 
 @Controller('weather/get')
 export class GetController {

@@ -1,8 +1,9 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { firstValueFrom } from 'rxjs';
+import { FetchDataApiException } from 'src/filters/exceptions/fetch-data-api.exception';
 import { LocationType } from 'src/weather/types/weather.types';
 import {
   FetchDataApiGeoResponse,
@@ -27,35 +28,16 @@ export class FetchDataApiService {
       const { data } = await firstValueFrom(
         this.httpService.get(this.weatherUrl, { params }),
       );
+
       if (data.error) {
-        throw new HttpException(
-          { status: HttpStatus.BAD_REQUEST, message: 'Invalid coordinates' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new FetchDataApiException('Invalid coordinates');
       }
 
       return {
         data,
       };
-    } catch ({ response }) {
-      throw new HttpException(
-        {
-          status:
-            response.status === 404
-              ? HttpStatus.INTERNAL_SERVER_ERROR
-              : HttpStatus.BAD_REQUEST,
-          error:
-            response.status === 404
-              ? 'Internal server error'
-              : response.message,
-        },
-        response.status === 404
-          ? HttpStatus.INTERNAL_SERVER_ERROR
-          : HttpStatus.BAD_REQUEST,
-        {
-          cause: response,
-        },
-      );
+    } catch (error) {
+      throw new FetchDataApiException(error.message);
     }
   }
 
@@ -71,10 +53,7 @@ export class FetchDataApiService {
       );
 
       if (!data.hasOwnProperty('results')) {
-        throw new HttpException(
-          { status: HttpStatus.BAD_REQUEST, message: 'Location not found' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new FetchDataApiException('Location not found');
       }
 
       const {
@@ -89,25 +68,8 @@ export class FetchDataApiService {
             ? LocationType.COUNTRY
             : LocationType.CITY,
       };
-    } catch ({ response }) {
-      throw new HttpException(
-        {
-          status:
-            response.status === 404
-              ? HttpStatus.INTERNAL_SERVER_ERROR
-              : HttpStatus.BAD_REQUEST,
-          error:
-            response.status === 404
-              ? 'Internal server error'
-              : response.message,
-        },
-        response.status === 404
-          ? HttpStatus.INTERNAL_SERVER_ERROR
-          : HttpStatus.BAD_REQUEST,
-        {
-          cause: response,
-        },
-      );
+    } catch (error) {
+      throw new FetchDataApiException(error.message);
     }
   }
 }

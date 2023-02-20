@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PredictionService } from './prediction.service';
+import { PredictionService } from '../prediction.service';
 import { ConfigService } from '@nestjs/config';
 import { HttpModule } from '@nestjs/axios';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';

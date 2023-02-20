@@ -2,7 +2,7 @@ import { HttpModule } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
 import { ToolsService } from 'src/tools/tools.service';
-import { GetService } from './get.service';
+import { GetService } from '../get.service';
 import { ConfigService } from '@nestjs/config';
 import {
   CoordinatesInput,

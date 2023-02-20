@@ -5,7 +5,7 @@ import { GetService } from 'src/weather/get/services/get.service';
 import { WeatherResponse } from 'src/weather/types/get.types';
 import { ToolsService } from 'src/tools/tools.service';
 import { LocationType } from 'src/weather/types/weather.types';
-import { GetController } from './get.controller';
+import { GetController } from '../get.controller';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
 import { plainToInstance } from 'class-transformer';
@@ -13,7 +13,7 @@ import {
   CityParam,
   CountryParam,
   GeoCoordinatesParam,
-} from 'src/Validation/validation.module';
+} from 'src/validation/validation.module';
 import { validate } from 'class-validator';
 
 describe('GetController', () => {

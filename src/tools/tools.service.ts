@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { WeatherInfo } from 'src/prediction/types/prediction.types';
+import { WeatherInfo } from 'src/weather/types/prediction.types';
 
 type DataElement = {
   time: string;
