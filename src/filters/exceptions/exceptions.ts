@@ -18,3 +18,10 @@ export class InternalServerException extends Error {
     this.name = 'InternalServerException';
   }
 }
+
+export class LocationTypeException extends Error {
+  constructor(readonly message: string) {
+    super(message);
+    this.name = 'LocationTypeException';
+  }
+}

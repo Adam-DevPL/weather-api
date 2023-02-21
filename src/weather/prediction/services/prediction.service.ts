@@ -1,7 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
 import { FetchDataApiParams } from 'src/fetch-data-api/types/FetchDataApi.types';
+import {
+  InternalServerException,
+  LocationTypeException,
+} from 'src/filters/exceptions/exceptions';
 import { ToolsService } from 'src/tools/tools.service';
 import {
   ApiResponsePredictRoute,
@@ -32,9 +36,8 @@ export class PredictionService {
       await this.fetchDataApi.getGeoLocation(locationName);
 
     if (locationType !== location) {
-      throw new HttpException(
+      throw new LocationTypeException(
         `It is not a ${LocationType[locationType]}: ${locationName}`,
-        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -65,9 +68,8 @@ export class PredictionService {
       await this.fetchDataApi.getGeoLocation(locationName);
 
     if (locationType !== location) {
-      throw new HttpException(
+      throw new LocationTypeException(
         `It is not a ${LocationType[locationType]}: ${locationName}`,
-        HttpStatus.BAD_REQUEST,
       );
     }
 
@@ -139,10 +141,7 @@ export class PredictionService {
         weatherCodeArr: weathercode,
       } as ApiResponsePredictRoute;
     } catch (error) {
-      throw new HttpException(
-        'Internal server error',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
+      throw new InternalServerException('Internal server error');
     }
   }
 }

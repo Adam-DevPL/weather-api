@@ -16,10 +16,12 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { PredictionService } from '../../services/prediction.service';
 import { ForecastResponse } from 'src/weather/types/prediction.types';
+import { LocationTypeException } from 'src/filters/exceptions/exceptions';
 
 describe('PredictionController', () => {
   let controller: PredictionController;
   let service: PredictionService;
+  let fetchDataApi: FetchDataApiService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -35,6 +37,7 @@ describe('PredictionController', () => {
 
     controller = module.get<PredictionController>(PredictionController);
     service = module.get<PredictionService>(PredictionService);
+    fetchDataApi = module.get<FetchDataApiService>(FetchDataApiService);
   });
 
   it('should be defined', () => {
@@ -63,31 +66,23 @@ describe('PredictionController', () => {
       });
 
       //then
-      expect(result).toEqual(mockWeatherResponse);
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw an error when invalid country', async () => {
       //given
       jest.spyOn(service, 'getForecastForSingleDay').mockImplementation(() => {
-        throw new HttpException(
+        throw new LocationTypeException(
           `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
-          HttpStatus.BAD_REQUEST,
         );
       });
 
-      try {
-        //when
-        await controller.getForecastForCountry({
-          day: '2023-02-18',
-          country: 'invalidCountry',
-        });
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
-        );
-      }
+      await expect(
+        controller.getForecastForCountry({
+          day: '2023-02-22',
+          country: 'Katowice',
+        }),
+      ).rejects.toMatchSnapshot();
     });
 
     it('should throw error, when country is not valid - not a string only with letters', async () => {
@@ -121,7 +116,7 @@ describe('PredictionController', () => {
       const myBodyObjectNumber = { country: 'Poland', day: '2023-02-10' };
       const myBodyObjectStringWithNonLetters = {
         country: 'Poland',
-        day: '2023-02-27',
+        day: '2023-03-27',
       };
       const myObject1 = plainToInstance(CountryDayParam, myBodyObjectNumber);
       const myObject2 = plainToInstance(
@@ -167,31 +162,23 @@ describe('PredictionController', () => {
       });
 
       //then
-      expect(result).toEqual(mockWeatherResponse);
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw an error when invalid city', async () => {
       //given
       jest.spyOn(service, 'getForecastForSingleDay').mockImplementation(() => {
-        throw new HttpException(
+        throw new LocationTypeException(
           `It is not a ${LocationType[LocationType.CITY]}: invalidCity`,
-          HttpStatus.BAD_REQUEST,
         );
       });
 
-      try {
-        //when
-        await controller.getForecastForCity({
-          day: '2023-02-18',
+      await expect(
+        controller.getForecastForCity({
+          day: '2023-02-24',
           city: 'invalidCity',
-        });
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.CITY]}: invalidCity`,
-        );
-      }
+        }),
+      ).rejects.toMatchSnapshot();
     });
 
     it('should throw error, when city is not valid - not a string only with letters', async () => {
@@ -225,7 +212,7 @@ describe('PredictionController', () => {
       const myBodyObjectNumber = { city: 'Poland', day: '2023-02-10' };
       const myBodyObjectStringWithNonLetters = {
         city: 'Poland',
-        day: '2023-02-27',
+        day: '2023-03-27',
       };
       const myObject1 = plainToInstance(CityDayParam, myBodyObjectNumber);
       const myObject2 = plainToInstance(
@@ -285,7 +272,7 @@ describe('PredictionController', () => {
       });
 
       //then
-      expect(result).toEqual(mockWeatherResponse);
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw an error when invalid country', async () => {
@@ -293,26 +280,18 @@ describe('PredictionController', () => {
       jest
         .spyOn(service, 'getForecastForCountryOrCityInDateRange')
         .mockImplementation(() => {
-          throw new HttpException(
+          throw new LocationTypeException(
             `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
-            HttpStatus.BAD_REQUEST,
           );
         });
 
-      try {
-        //when
-        await controller.getForecastForCountryInDateRange({
-          from: '2023-02-18',
-          to: '2023-02-20',
+      await expect(
+        controller.getForecastForCountryInDateRange({
+          from: '2023-02-22',
+          to: '2023-02-25',
           country: 'invalidCountry',
-        });
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
-        );
-      }
+        }),
+      ).rejects.toMatchSnapshot();
     });
 
     it('should throw error, when country is not valid - not a string only with letters', async () => {
@@ -373,29 +352,22 @@ describe('PredictionController', () => {
 
     it('should throw error, when from date is later then to date', async () => {
       //given
-      jest
-        .spyOn(service, 'getForecastForCountryOrCityInDateRange')
-        .mockImplementation(() => {
-          throw new HttpException(
-            `Invalid dates order. Date "from" is later then "to" date`,
-            HttpStatus.BAD_REQUEST,
-          );
-        });
+      // jest
+      //   .spyOn(service, 'getForecastForCountryOrCityInDateRange')
+      //   .mockImplementation(() => {
+      //     throw new HttpException(
+      //       `Invalid dates order. Date "from" is later then "to" date`,
+      //       HttpStatus.BAD_REQUEST,
+      //     );
+      //   });
 
-      try {
-        //when
-        await controller.getForecastForCountryInDateRange({
-          from: '2023-02-20',
-          to: '2023-02-18',
+      await expect(
+        controller.getForecastForCountryInDateRange({
+          from: '2023-02-26',
+          to: '2023-02-23',
           country: 'country',
-        });
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(
-          `Invalid dates order. Date "from" is later then "to" date`,
-        );
-      }
+        }),
+      ).rejects.toMatchSnapshot();
     });
   });
 

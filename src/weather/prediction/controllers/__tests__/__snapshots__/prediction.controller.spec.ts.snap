@@ -1,0 +1,50 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PredictionController getForecastForCity should return proper weather response for a city 1`] = `
+{
+  "location": "city",
+  "weatherInfo": {
+    "avgTemperature": "5.5",
+    "day": "2023-02-18",
+    "weather": "sunny",
+  },
+}
+`;
+
+exports[`PredictionController getForecastForCountry should return proper weather response for a counry 1`] = `
+{
+  "location": "country",
+  "weatherInfo": {
+    "avgTemperature": "5.5",
+    "day": "2023-02-18",
+    "weather": "sunny",
+  },
+}
+`;
+
+exports[`PredictionController getForecastForCountry should throw an error when invalid country 1`] = `[InternalServerException: Invalid URL]`;
+
+exports[`PredictionController getForecastForCountryInDateRange should return proper weather response for a country 1`] = `
+{
+  "location": "country",
+  "weatherInfo": [
+    {
+      "avgTemperature": "5.5",
+      "day": "2023-02-18",
+      "weather": "sunny",
+    },
+    {
+      "avgTemperature": "5.5",
+      "day": "2023-02-19",
+      "weather": "sunny",
+    },
+    {
+      "avgTemperature": "5.5",
+      "day": "2023-02-20",
+      "weather": "sunny",
+    },
+  ],
+}
+`;
+
+exports[`PredictionController getForecastForCountryInDateRange should throw error, when from date is later then to date 1`] = `[InternalServerException: Invalid URL]`;

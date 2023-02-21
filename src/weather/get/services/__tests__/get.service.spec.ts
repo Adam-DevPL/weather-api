@@ -9,7 +9,7 @@ import {
   LocationNameInput,
   LocationType,
 } from 'src/weather/types/weather.types';
-import { HttpException, HttpStatus } from '@nestjs/common';
+import { LocationException } from 'src/filters/exceptions/exceptions';
 
 describe('GetService', () => {
   let service: GetService;
@@ -53,11 +53,7 @@ describe('GetService', () => {
       );
 
       //then
-      expect(result).toEqual({
-        location: 'Poland',
-        avgTemperature: 10,
-        weather: 'Rain',
-      });
+      expect(result).toMatchSnapshot();
     });
 
     it('should return a weather resposne for city', async () => {
@@ -83,11 +79,7 @@ describe('GetService', () => {
       );
 
       //then
-      expect(result).toEqual({
-        location: 'City',
-        avgTemperature: 10,
-        weather: 'Rain',
-      });
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw error for invalid parameters, getting City instead of Country', async () => {
@@ -103,25 +95,9 @@ describe('GetService', () => {
         location: LocationType.CITY,
       });
 
-      jest
-        .spyOn(service, 'getCurrentWeatherWithoutCoordinates')
-        .mockImplementation(() => {
-          throw new HttpException(
-            `It is not a ${LocationType[LocationType.COUNTRY]}: City`,
-            HttpStatus.BAD_REQUEST,
-          );
-        });
-
-      try {
-        //when
-        await service.getCurrentWeatherWithoutCoordinates(locationNameParam);
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.COUNTRY]}: City`,
-        );
-      }
+      await expect(
+        service.getCurrentWeatherWithoutCoordinates(locationNameParam),
+      ).rejects.toMatchSnapshot();
     });
 
     it('should throw error for invalid parameters - location name in invalid', async () => {
@@ -132,17 +108,12 @@ describe('GetService', () => {
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockImplementation(() => {
-        throw new HttpException('Location not found', HttpStatus.BAD_REQUEST);
+        throw new LocationException('Location not found');
       });
 
-      try {
-        //when
-        await service.getCurrentWeatherWithoutCoordinates(locationNameParam);
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(`Location not found`);
-      }
+      await expect(
+        service.getCurrentWeatherWithoutCoordinates(locationNameParam),
+      ).rejects.toMatchSnapshot();
     });
   });
 
@@ -163,14 +134,7 @@ describe('GetService', () => {
       );
 
       //then
-      expect(result).toEqual({
-        location: {
-          latitude: 20,
-          longitude: 20,
-        },
-        avgTemperature: 10,
-        weather: 'Rain',
-      });
+      expect(result).toMatchSnapshot();
     });
   });
 });

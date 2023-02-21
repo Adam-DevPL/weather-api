@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { WeatherResponse, ApiResponse } from 'src/weather/types/get.types';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
 import { FetchDataApiParams } from 'src/fetch-data-api/types/FetchDataApi.types';
@@ -8,6 +8,7 @@ import {
   LocationNameInput,
   LocationType,
 } from 'src/weather/types/weather.types';
+import { LocationTypeException } from 'src/filters/exceptions/exceptions';
 
 @Injectable()
 export class GetService {
@@ -24,9 +25,8 @@ export class GetService {
       await this.fetchDataApi.getGeoLocation(locationName);
 
     if (locationType !== location) {
-      throw new HttpException(
+      throw new LocationTypeException(
         `It is not a ${LocationType[locationType]}: ${locationName}`,
-        HttpStatus.BAD_REQUEST,
       );
     }
 

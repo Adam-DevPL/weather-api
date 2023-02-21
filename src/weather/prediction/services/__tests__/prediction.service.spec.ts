@@ -10,13 +10,15 @@ import {
   LocationNameInputDay,
   LocationType,
 } from 'src/weather/types/weather.types';
-import { HttpException, HttpStatus } from '@nestjs/common';
 import { temperature, time, weathercode } from './testData';
+import {
+  InternalServerException,
+  LocationException,
+} from 'src/filters/exceptions/exceptions';
 
 describe('PredictionService', () => {
   let service: PredictionService;
   let fetchDataApi: FetchDataApiService;
-  // let tools: ToolsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -31,7 +33,6 @@ describe('PredictionService', () => {
 
     service = module.get<PredictionService>(PredictionService);
     fetchDataApi = module.get<FetchDataApiService>(FetchDataApiService);
-    // tools = module.get<ToolsService>(ToolsService);
   });
 
   it('should be defined', () => {
@@ -64,14 +65,7 @@ describe('PredictionService', () => {
       );
 
       //then
-      expect(result).toEqual({
-        location: 'country',
-        weatherInfo: {
-          day: '2023-02-15',
-          avgTemperature: '20.0',
-          weather: 'Mainly clear, partly cloudy, and overcast',
-        },
-      });
+      expect(result).toMatchSnapshot();
     });
 
     it('should return weather response for valid city - forecast on 1 day', async () => {
@@ -99,14 +93,7 @@ describe('PredictionService', () => {
       );
 
       //then
-      expect(result).toEqual({
-        location: 'city',
-        weatherInfo: {
-          day: '2023-02-15',
-          avgTemperature: '20.0',
-          weather: 'Mainly clear, partly cloudy, and overcast',
-        },
-      });
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw error, when wants country, but get city - forecast on 1 day', async () => {
@@ -123,23 +110,9 @@ describe('PredictionService', () => {
         location: LocationType.CITY,
       });
 
-      jest.spyOn(service, 'getForecastForSingleDay').mockImplementation(() => {
-        throw new HttpException(
-          `It is not a ${LocationType[LocationType.COUNTRY]}: City`,
-          HttpStatus.BAD_REQUEST,
-        );
-      });
-
-      try {
-        //when
-        await service.getForecastForSingleDay(locationNameInputDay);
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.COUNTRY]}: City`,
-        );
-      }
+      await expect(
+        service.getForecastForSingleDay(locationNameInputDay),
+      ).rejects.toMatchSnapshot();
     });
 
     it('should throw error, when unnamed city - forecast on 1 day', async () => {
@@ -151,17 +124,12 @@ describe('PredictionService', () => {
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockImplementation(() => {
-        throw new HttpException('Location not found', HttpStatus.BAD_REQUEST);
+        throw new LocationException('Location not found');
       });
 
-      try {
-        //when
-        await service.getForecastForSingleDay(locationNameInputDay);
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(`Location not found`);
-      }
+      await expect(
+        service.getForecastForSingleDay(locationNameInputDay),
+      ).rejects.toMatchSnapshot();
     });
   });
 
@@ -193,26 +161,7 @@ describe('PredictionService', () => {
       );
 
       //then
-      expect(result).toEqual({
-        location: 'country',
-        weatherInfo: [
-          {
-            day: '2023-02-15',
-            avgTemperature: '1.5',
-            weather: 'Fog and depositing rime fog',
-          },
-          {
-            day: '2023-02-16',
-            avgTemperature: '2.3',
-            weather: 'Mainly clear, partly cloudy, and overcast',
-          },
-          {
-            day: '2023-02-17',
-            avgTemperature: '5.3',
-            weather: 'Rain: Slight, moderate and heavy intensity',
-          },
-        ],
-      });
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw error when unnamed country id dates range', async () => {
@@ -225,19 +174,12 @@ describe('PredictionService', () => {
       };
 
       jest.spyOn(fetchDataApi, 'getGeoLocation').mockImplementation(() => {
-        throw new HttpException('Location not found', HttpStatus.BAD_REQUEST);
+        throw new LocationException('Location not found');
       });
 
-      try {
-        //when
-        await service.getForecastForCountryOrCityInDateRange(
-          locationNameInputDates,
-        );
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(`Location not found`);
-      }
+      await expect(
+        service.getForecastForCountryOrCityInDateRange(locationNameInputDates),
+      ).rejects.toMatchSnapshot();
     });
   });
 
@@ -263,29 +205,7 @@ describe('PredictionService', () => {
       );
 
       //then
-      expect(result).toEqual({
-        location: {
-          latitude: 20,
-          longitude: 20,
-        },
-        weatherInfo: [
-          {
-            day: '2023-02-15',
-            avgTemperature: '1.5',
-            weather: 'Fog and depositing rime fog',
-          },
-          {
-            day: '2023-02-16',
-            avgTemperature: '2.3',
-            weather: 'Mainly clear, partly cloudy, and overcast',
-          },
-          {
-            day: '2023-02-17',
-            avgTemperature: '5.3',
-            weather: 'Rain: Slight, moderate and heavy intensity',
-          },
-        ],
-      });
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw error when problem with external api occur', async () => {
@@ -298,22 +218,12 @@ describe('PredictionService', () => {
       };
 
       jest.spyOn(service, <any>'getDataApi').mockImplementation(() => {
-        throw new HttpException(
-          'Internal server error',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
+        throw new InternalServerException('Internal server error');
       });
 
-      try {
-        //when
-        await service.getForecastForGeoLocationInDateRange(
-          coordinatesInputDates,
-        );
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
-        expect(error.message).toBe('Internal server error');
-      }
+      await expect(
+        service.getForecastForGeoLocationInDateRange(coordinatesInputDates),
+      ).rejects.toMatchSnapshot();
     });
   });
 });

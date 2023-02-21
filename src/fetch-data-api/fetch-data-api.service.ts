@@ -56,7 +56,7 @@ export class FetchDataApiService {
       };
 
       const { data } = await firstValueFrom(
-        this.httpService.get(this.geoUrl, { params }),
+        this.httpService.get(`${this.geoUrl}?name=${name}&count=1`),
       );
 
       if (!data.hasOwnProperty('results')) {

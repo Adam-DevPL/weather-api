@@ -7,5 +7,3 @@ exports[`FetchDataApiService getDataFromApi should throw error when problem with
 exports[`FetchDataApiService getGeoLocation should throw error when invalid location 1`] = `[LocationException: Location not found]`;
 
 exports[`FetchDataApiService getGeoLocation should throw error when problem with external api 1`] = `[InternalServerException: Invalid URL]`;
-
-exports[`FetchDataApiService should throw error when problem with external api 1`] = `[InternalServerException: Invalid URL]`;

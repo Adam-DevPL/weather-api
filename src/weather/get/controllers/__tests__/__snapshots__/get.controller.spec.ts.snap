@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GetController getLocationWeather should return a WeatherResponse for a valid coordinates 1`] = `
+{
+  "avgTemperature": 20,
+  "location": {
+    "latitude": 20,
+    "longitude": 20,
+  },
+  "weather": "Sunny",
+}
+`;
+
+exports[`GetController getWeatherForCity should return a WeatherResponse for a valid country 1`] = `
+{
+  "avgTemperature": 20,
+  "location": "cityName",
+  "weather": "Sunny",
+}
+`;
+
+exports[`GetController getWeatherForCity should throw an error for an invalid city 1`] = `[LocationTypeException: It is not a CITY: invalidCity]`;
+
+exports[`GetController getWeatherForCountry should return a WeatherResponse for a valid city 1`] = `
+{
+  "avgTemperature": 20,
+  "location": "coutryName",
+  "weather": "Sunny",
+}
+`;
+
+exports[`GetController getWeatherForCountry should throw an error for an invalid country 1`] = `[LocationTypeException: It is not a COUNTRY: invalidCountry]`;

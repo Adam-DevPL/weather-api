@@ -1,5 +1,4 @@
 import { HttpModule } from '@nestjs/axios';
-import { HttpException, HttpStatus } from '@nestjs/common';
 import { FetchDataApiService } from 'src/fetch-data-api/fetch-data-api.service';
 import { GetService } from 'src/weather/get/services/get.service';
 import { WeatherResponse } from 'src/weather/types/get.types';
@@ -15,6 +14,7 @@ import {
   GeoCoordinatesParam,
 } from 'src/validation/validation.module';
 import { validate } from 'class-validator';
+import { LocationTypeException } from 'src/filters/exceptions/exceptions';
 
 describe('GetController', () => {
   let controller: GetController;
@@ -53,7 +53,7 @@ describe('GetController', () => {
       });
 
       //then
-      expect(result).toEqual(mockWeatherResponse);
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw an error for an invalid country', async () => {
@@ -61,24 +61,16 @@ describe('GetController', () => {
       jest
         .spyOn(service, 'getCurrentWeatherWithoutCoordinates')
         .mockImplementation(() => {
-          throw new HttpException(
+          throw new LocationTypeException(
             `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
-            HttpStatus.BAD_REQUEST,
           );
         });
 
-      try {
-        //when
-        await controller.getWeatherForCountry({
+      await expect(
+        controller.getWeatherForCountry({
           country: 'invalidCountry',
-        });
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCountry`,
-        );
-      }
+        }),
+      ).rejects.toMatchSnapshot();
     });
 
     it('should fail on invalid city - not a string or string with no only letters', async () => {
@@ -123,7 +115,7 @@ describe('GetController', () => {
       });
 
       //then
-      expect(result).toEqual(mockWeatherResponse);
+      expect(result).toMatchSnapshot();
     });
 
     it('should throw an error for an invalid city', async () => {
@@ -131,24 +123,16 @@ describe('GetController', () => {
       jest
         .spyOn(service, 'getCurrentWeatherWithoutCoordinates')
         .mockImplementation(() => {
-          throw new HttpException(
-            `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCity`,
-            HttpStatus.BAD_REQUEST,
+          throw new LocationTypeException(
+            `It is not a ${LocationType[LocationType.CITY]}: invalidCity`,
           );
         });
 
-      try {
-        //when
-        await controller.getWeatherForCountry({
-          country: 'invalidCity',
-        });
-      } catch (error) {
-        //then
-        expect(error.status).toBe(HttpStatus.BAD_REQUEST);
-        expect(error.message).toBe(
-          `It is not a ${LocationType[LocationType.COUNTRY]}: invalidCity`,
-        );
-      }
+      await expect(
+        controller.getWeatherForCity({
+          city: 'invalidCity',
+        }),
+      ).rejects.toMatchSnapshot();
     });
 
     it('should fail on invalid city - not a string or string with no only letters', async () => {
@@ -175,7 +159,7 @@ describe('GetController', () => {
     });
   });
 
-  describe('getWeatherForCity', () => {
+  describe('getLocationWeather', () => {
     it('should return a WeatherResponse for a valid coordinates', async () => {
       //given
       const mockWeatherResponse: WeatherResponse = {
@@ -197,7 +181,7 @@ describe('GetController', () => {
       });
 
       //then
-      expect(result).toEqual(mockWeatherResponse);
+      expect(result).toMatchSnapshot();
     });
 
     it('should fail on invalid coordinates - not a number or not in range -180 and 180', async () => {
