@@ -1,0 +1,80 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PredictionService getForecastForCountryOrCityInDateRange should return weather info for a country/city in data range 1`] = `
+{
+  "location": "country",
+  "weatherInfo": [
+    {
+      "avgTemperature": "1.5",
+      "day": "2023-02-15",
+      "weather": "Fog and depositing rime fog",
+    },
+    {
+      "avgTemperature": "2.3",
+      "day": "2023-02-16",
+      "weather": "Mainly clear, partly cloudy, and overcast",
+    },
+    {
+      "avgTemperature": "5.3",
+      "day": "2023-02-17",
+      "weather": "Rain: Slight, moderate and heavy intensity",
+    },
+  ],
+}
+`;
+
+exports[`PredictionService getForecastForCountryOrCityInDateRange should throw error when unnamed country id dates range 1`] = `[LocationException: Location not found]`;
+
+exports[`PredictionService getForecastForGeoLocationInDateRange should return weather response when valid coordinates 1`] = `
+{
+  "location": {
+    "latitude": 20,
+    "longitude": 20,
+  },
+  "weatherInfo": [
+    {
+      "avgTemperature": "1.5",
+      "day": "2023-02-15",
+      "weather": "Fog and depositing rime fog",
+    },
+    {
+      "avgTemperature": "2.3",
+      "day": "2023-02-16",
+      "weather": "Mainly clear, partly cloudy, and overcast",
+    },
+    {
+      "avgTemperature": "5.3",
+      "day": "2023-02-17",
+      "weather": "Rain: Slight, moderate and heavy intensity",
+    },
+  ],
+}
+`;
+
+exports[`PredictionService getForecastForGeoLocationInDateRange should throw error when problem with external api occur 1`] = `[InternalServerException: Internal server error]`;
+
+exports[`PredictionService getForecastForSingleDay should return weather response for valid city - forecast on 1 day 1`] = `
+{
+  "location": "city",
+  "weatherInfo": {
+    "avgTemperature": "20.0",
+    "day": "2023-02-15",
+    "weather": "Mainly clear, partly cloudy, and overcast",
+  },
+}
+`;
+
+exports[`PredictionService getForecastForSingleDay should return weather response for valid country - forecast on 1 day 1`] = `
+{
+  "location": "country",
+  "weatherInfo": {
+    "avgTemperature": "20.0",
+    "day": "2023-02-15",
+    "weather": "Mainly clear, partly cloudy, and overcast",
+  },
+}
+`;
+
+exports[`PredictionService getForecastForSingleDay should throw error, when unnamed city - forecast on 1 day 1`] = `[LocationException: Location not found]`;
+
+exports[`PredictionService getForecastForSingleDay should throw error, when wants country, but get city - forecast on 1 day 1`] = `[LocationTypeException: It is not a COUNTRY: city]`;

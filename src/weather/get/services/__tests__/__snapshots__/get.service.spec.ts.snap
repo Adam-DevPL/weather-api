@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GetService getCurrentWeatherWithCoordinates should return weather response for coordinates 1`] = `
+{
+  "avgTemperature": 10,
+  "location": {
+    "latitude": 20,
+    "longitude": 20,
+  },
+  "weather": "Rain",
+}
+`;
+
+exports[`GetService getCurrentWeatherWithoutCoordinates should return a weather resposne for city 1`] = `
+{
+  "avgTemperature": 10,
+  "location": "City",
+  "weather": "Rain",
+}
+`;
+
+exports[`GetService getCurrentWeatherWithoutCoordinates should return a weather resposne for country 1`] = `
+{
+  "avgTemperature": 10,
+  "location": "Poland",
+  "weather": "Rain",
+}
+`;
+
+exports[`GetService getCurrentWeatherWithoutCoordinates should throw error for invalid parameters - location name in invalid 1`] = `[LocationException: Location not found]`;
+
+exports[`GetService getCurrentWeatherWithoutCoordinates should throw error for invalid parameters, getting City instead of Country 1`] = `[LocationTypeException: It is not a COUNTRY: City]`;

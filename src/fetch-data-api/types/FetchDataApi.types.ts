@@ -1,4 +1,4 @@
-import { LocationType } from 'src/types/app.types';
+import { LocationType } from 'src/weather/types/weather.types';
 
 export type FetchDataApiParams = {
   latitude: number;

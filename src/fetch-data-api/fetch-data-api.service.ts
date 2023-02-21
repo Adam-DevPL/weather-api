@@ -1,9 +1,14 @@
 import { HttpService } from '@nestjs/axios';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 import { firstValueFrom } from 'rxjs';
-import { LocationType } from 'src/types/app.types';
+import {
+  CoordinatesException,
+  InternalServerException,
+  LocationException,
+} from 'src/filters/exceptions/exceptions';
+import { LocationType } from 'src/weather/types/weather.types';
 import {
   FetchDataApiGeoResponse,
   FetchDataApiParams,
@@ -27,35 +32,19 @@ export class FetchDataApiService {
       const { data } = await firstValueFrom(
         this.httpService.get(this.weatherUrl, { params }),
       );
+
       if (data.error) {
-        throw new HttpException(
-          { status: HttpStatus.BAD_REQUEST, message: 'Invalid coordinates' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new CoordinatesException('Invalid coordinates');
       }
 
       return {
         data,
       };
-    } catch ({ response }) {
-      throw new HttpException(
-        {
-          status:
-            response.status === 404
-              ? HttpStatus.INTERNAL_SERVER_ERROR
-              : HttpStatus.BAD_REQUEST,
-          error:
-            response.status === 404
-              ? 'Internal server error'
-              : response.message,
-        },
-        response.status === 404
-          ? HttpStatus.INTERNAL_SERVER_ERROR
-          : HttpStatus.BAD_REQUEST,
-        {
-          cause: response,
-        },
-      );
+    } catch (error) {
+      if (error instanceof CoordinatesException) {
+        throw new CoordinatesException(error.message);
+      }
+      throw new InternalServerException(error.message);
     }
   }
 
@@ -67,14 +56,11 @@ export class FetchDataApiService {
       };
 
       const { data } = await firstValueFrom(
-        this.httpService.get(this.geoUrl, { params }),
+        this.httpService.get(`${this.geoUrl}?name=${name}&count=1`),
       );
 
       if (!data.hasOwnProperty('results')) {
-        throw new HttpException(
-          { status: HttpStatus.BAD_REQUEST, message: 'Location not found' },
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new LocationException('Location not found');
       }
 
       const {
@@ -86,28 +72,14 @@ export class FetchDataApiService {
         longitude,
         location:
           country.toLowerCase() === name.toLowerCase()
-            ? LocationType.Country
-            : LocationType.City,
+            ? LocationType.COUNTRY
+            : LocationType.CITY,
       };
-    } catch ({ response }) {
-      throw new HttpException(
-        {
-          status:
-            response.status === 404
-              ? HttpStatus.INTERNAL_SERVER_ERROR
-              : HttpStatus.BAD_REQUEST,
-          error:
-            response.status === 404
-              ? 'Internal server error'
-              : response.message,
-        },
-        response.status === 404
-          ? HttpStatus.INTERNAL_SERVER_ERROR
-          : HttpStatus.BAD_REQUEST,
-        {
-          cause: response,
-        },
-      );
+    } catch (error) {
+      if (error instanceof LocationException) {
+        throw new LocationException(error.message);
+      }
+      throw new InternalServerException(error.message);
     }
   }
 }
